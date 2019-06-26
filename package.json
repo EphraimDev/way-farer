@@ -1,0 +1,26 @@
+{
+  "name": "way-farer",
+  "version": "1.0.0",
+  "description": "public bus transportation booking server",
+  "main": "app.js",
+  "scripts": {
+    "eslint-init": "./node_modules/.bin/eslint --init",
+    "eslint": "./node_modules/.bin/eslint ./src/**/*.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EphraimDev/way-farer.git"
+  },
+  "author": "Ephraim Aigbefo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EphraimDev/way-farer/issues"
+  },
+  "homepage": "https://github.com/EphraimDev/way-farer#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.18.0"
+  }
+}
