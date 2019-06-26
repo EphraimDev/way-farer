@@ -4,6 +4,8 @@
   "description": "public bus transportation booking server",
   "main": "app.js",
   "scripts": {
+    "eslint-init": "./node_modules/.bin/eslint --init",
+    "eslint": "./node_modules/.bin/eslint ./src/**/*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,6 +19,8 @@
   },
   "homepage": "https://github.com/EphraimDev/way-farer#readme",
   "devDependencies": {
-    "eslint": "^6.0.1"
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.18.0"
   }
 }
