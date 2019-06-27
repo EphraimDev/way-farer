@@ -3,6 +3,7 @@ import chai,{expect} from 'chai';
 import chaiHttp from 'chai-http';
 
 import app from '../app';
+import { type } from 'os';
 
 chai.should();
 
@@ -147,10 +148,31 @@ describe('Trips', () => {
                 done()
             })
         });
+
+        it('should check for trip that has started', (done) => {
+            chai.request(app)
+            .put('/api/v1/trips/modify/2')
+            .send({
+                bus_id: "FBC22DE",
+                destination: "CMS",
+                trip_date: "10/12/2019",
+                fare: 500.00
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(400);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("This trip has started already");
+                done()
+            })
+        });
     });
 
     describe('GET /api/v1/trips/all', () => {
-        it('should return all buses',  (done) => {
+        it('should return all trips',  (done) => {
             chai.request(app)
             .get('/api/v1/trip/all')
             .then((res) => {
@@ -221,6 +243,93 @@ describe('Trips', () => {
                 expect(body.status).to.equal("error");
                 expect(body.error).to.be.a("string");
                 expect(body.error).to.equal("This trip does not exist");
+                done()
+            })
+        });
+    });
+
+    describe('GET /api/v1/trips/filter/origin?query=', () => {
+        it('should return all the trips matching origin query',  (done) => {
+            chai.request(app)
+            .get(`/api/v1/trips/filter/origin?query=${type}`)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(200);
+                expect(body).to.contain.property('status');
+                expect(body.status).to.equal("success");
+                done()
+            })
+        });
+
+        it("should return null if search query does not exist", (done) => {
+            chai.request(app)
+            .get(`/api/v1/trips/filter/origin?query=${type}`)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(404);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("No trip available");
+                done()
+            })
+        });
+    });
+
+    describe('GET /api/v1/trips/filter/origin?query=', () => {
+        it('should return all the trips matching origin query',  (done) => {
+            chai.request(app)
+            .get(`/api/v1/trips/filter/origin?query=${type}`)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(200);
+                expect(body).to.contain.property('status');
+                expect(body.status).to.equal("success");
+                done()
+            })
+        });
+
+        it("should return null if search query does not exist", (done) => {
+            chai.request(app)
+            .get(`/api/v1/trips/filter/origin?query=none`)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(404);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("No trip available");
+                done()
+            })
+        });
+    });
+
+    describe('GET /api/v1/trips/filter/destination?query=', () => {
+        it('should return all the trips matching destination query',  (done) => {
+            chai.request(app)
+            .get(`/api/v1/trips/filter/origin?query=${type}`)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(200);
+                expect(body).to.contain.property('status');
+                expect(body.status).to.equal("success");
+                done()
+            })
+        });
+
+        it("should return null if search query does not exist", (done) => {
+            chai.request(app)
+            .get(`/api/v1/trips/filter/origin?query=none`)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(404);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("No trip available");
                 done()
             })
         });
