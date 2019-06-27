@@ -13,12 +13,20 @@ describe('Users Authentication', () => {
         it('should add a user',  (done) => {
             chai.request(app)
             .post('/api/v1/auth/signup')
-            .send({})
+            .send({
+                id: 1,
+                email: "test@test.co",
+                first_name: "Way",
+                last_name: "Farer",
+                password: "Password1!",
+                is_admin: true
+            })
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(201);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
+                expect(body.data).to.contain.property('token');
                 expect(body.status).to.equal("success");
                 expect(body.data).to.be.an("object");
                 done()
@@ -28,7 +36,14 @@ describe('Users Authentication', () => {
         it('should check if user exists',  (done) => {
             chai.request(app)
             .post('/api/v1/auth/signup')
-            .send({})
+            .send({
+                id: 1,
+                email: "test@test.co",
+                first_name: "Way",
+                last_name: "Farer",
+                password: "Password1!",
+                is_admin: true
+            })
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(400);
@@ -44,7 +59,14 @@ describe('Users Authentication', () => {
         it('should check for wrong input formats',  (done) => {
             chai.request(app)
             .post('/api/v1/auth/signup')
-            .send({})
+            .send({
+                id: 1,
+                email: "test",
+                first_name: "Way",
+                last_name: "Farer",
+                password: "Password1!",
+                is_admin: true
+            })
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(400);
@@ -62,12 +84,16 @@ describe('Users Authentication', () => {
         it('should log in a user',  (done) => {
             chai.request(app)
             .post('/api/v1/auth/login')
-            .send({})
+            .send({
+                email: "test@test.co",
+                password: "Password1!"
+            })
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(201);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
+                expect(body.data).to.contain.property('token');
                 expect(body.status).to.equal("success");
                 expect(body.data).to.be.an("object");
                 done()
@@ -77,7 +103,10 @@ describe('Users Authentication', () => {
         it('should check if user does not exists', (done) => {
             chai.request(app)
             .post('/api/v1/auth/login')
-            .send({})
+            .send({
+                email: "tes@test.co",
+                password: "Password1!"
+            })
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(400);
