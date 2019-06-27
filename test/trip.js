@@ -234,7 +234,7 @@ describe('Trips', () => {
 
         it("should fail for trips that don't exists", (done) => {
             chai.request(app)
-            .get('/api/v1/trips/cancel/none')
+            .delete('/api/v1/trips/cancel/none')
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(404);

@@ -9,6 +9,7 @@
     "eslint:init": "./node_modules/.bin/eslint --init",
     "eslint": "./node_modules/.bin/eslint ./src/**/*.js",
     "test": "cross-env NODE_ENV=test nyc mocha --require @babel/register --timeout 6000 test/*.js --exit",
+    "test:dev": "npm test && npm run coverge",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
