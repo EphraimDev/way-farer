@@ -7,6 +7,7 @@ CREATE TABLE users
     first_name VARCHAR(128) NOT NULL,
     last_name VARCHAR(128) NOT NULL,
     password VARCHAR(128) NOT NULL,
+    img VARCHAR(128),
     is_admin VARCHAR(5) NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,

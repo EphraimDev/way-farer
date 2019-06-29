@@ -20,7 +20,7 @@ const config = {
   test: {
     username: process.env.TEST_DB_USER,
     password: process.env.TEST_DB_PASS,
-    database: process.env.TEST_DATABASE,
+    database: process.env.TEST_DB_DATABASE,
     name: process.env.TEST_DB_NAME,
     host: process.env.TEST_DB_HOST,
   },
@@ -32,8 +32,8 @@ const config = {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.email, // fortestingprojects2018@gmail.com',
-        pass: process.env.password, // 'fortests@gmail.com',
+        user: process.env.email,
+        pass: process.env.password,
       },
     },
   },

@@ -30,7 +30,7 @@ const pool = (process.env.NODE_ENV === 'test') ? new pg.Pool(testConfig) : new p
 
 
 pool.on('connect', () => {
-    console.log('connected to the Database');
-  });
-  
+  console.log('connected to the Database');
+});
+
 export default pool;
