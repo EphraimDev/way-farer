@@ -45,13 +45,14 @@ class AuthController {
 
        await pool.query(queryHelper.createUser,
         [email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
-        
+        console.log(1)
         const newUser = await pool.query(queryHelper.text,[email]);
-        
+        console.log(2)
+        console.log(newUser.rows[0])
       const token = await Authorization.generateToken(newUser.rows[0]);
-        
+        console.log(3)
       await Mailer.createAccountMessage(email, firstname, lastname);
-        
+        console.log(4)
         
       return res.status(201).json({
         status: 'success',
