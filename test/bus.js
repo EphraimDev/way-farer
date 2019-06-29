@@ -123,7 +123,7 @@ describe('Buses', () => {
     describe('GET /api/v1/bus/all', () => {
         it('should return all buses',  (done) => {
             chai.request(app)
-            .get('/api/v1/bus')
+            .get('/api/v1/bus/all')
             .set('Authorization', token)
             .then((res) => {
                 const body = res.body;
