@@ -33,8 +33,7 @@ class Authorization {
         expiresIn: '48h',
       },
     );
-
-    this.token = token;
+    
       console.log(5)
       console.log(token)
     return token;
