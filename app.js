@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import morganLogger from 'morgan';
+import pool from './server/model/db';
 
 const app = express();
 
