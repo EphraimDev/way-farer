@@ -34,8 +34,6 @@ class Authorization {
       },
     );
     
-      console.log(5)
-      console.log(token)
     return token;
   }
 
