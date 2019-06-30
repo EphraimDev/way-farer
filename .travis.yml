@@ -13,6 +13,8 @@ env:
     - TEST_DB_USER=postgres
     - TEST_DB_DATABASE=wayfarer_test
     - JWT_KEY=secret
+    - email=ephraimappdev@gmail.com
+    - password=apptesting14@
 
 before_script:
   - psql -c 'CREATE DATABASE wayfarer_test;' -U postgres

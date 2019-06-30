@@ -3,6 +3,7 @@ import Authorization from '../middlewares/auth';
 import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
+import Mailer from '../utils/mailer';
 
 /**
  * @exports
@@ -42,12 +43,12 @@ class AuthController {
 
        await pool.query(queryHelper.createUser,
         [email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
-        console.log(1)
+       
         const newUser = await pool.query(queryHelper.text,[email]);
-        console.log(2)
-        console.log(newUser.rows[0])
+        
       const token = await Authorization.generateToken(newUser.rows[0]);
-        console.log(3)
+
+      Mailer.createAccountMessage(email);
         
       return res.status(201).json({
         status: 'success',
