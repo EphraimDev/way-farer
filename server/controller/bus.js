@@ -1,9 +1,6 @@
-import bcrypt from 'bcrypt';
-import Authorization from '../middlewares/auth';
 import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
-import Mailer from '../utils/mailer';
 
 /**
  * @exports
@@ -16,58 +13,45 @@ class BusController {
 
   /**
    * Add a new bus to the database
+   * @method addBus
+   * @memberof BusController
    * @param  {object} req - Request object
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  async signup(req, res) {
+  async addBus(req, res) {
     const {
-      firstname, lastname, email, password, image, isAdmin,
+      numberPlate, manufacturer, model, year, capacity, color, image,
     } = req.body;
+    
+    if (req.user.is_admin !== true) {
+      return res.status(401).json({
+        status: 'error',
+        error: 'Admin access only',
+      });
+    }
 
+    const findBus = await pool.query(queryHelper.getBus, [numberPlate]);
 
-    const findUser = await pool.query(queryHelper.text, [email]);
-
-    // console.log(findUser)
-    if (findUser.rowCount >= 1) {
+    if (findBus.rowCount >= 1) {
       return res.status(409).json({
         status: 'error',
-        error: 'User exists already',
+        error: 'A bus with same plate number already exists',
       });
     }
 
-    try {
-      const admin = !isAdmin ? false : isAdmin;
-      const img = !image ? '' : image;
-      const hashedPassword = await bcrypt.hashSync(password, 10);
+    const img = !image ? '' : image;
 
-      await pool.query(queryHelper.createUser,
-        [email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
+    await pool.query(queryHelper.addBus,
+      [req.user.id, numberPlate, manufacturer,
+        model, year, capacity, color, img, moment.createdAt]);
 
-      const newUser = await pool.query(queryHelper.text, [email]);
+    const newBus = await pool.query(queryHelper.getBus, [numberPlate]);
 
-      const token = await Authorization.generateToken(newUser.rows[0]);
-
-      Mailer.createAccountMessage(email);
-
-      return res.status(201).json({
-        status: 'success',
-        data: {
-          token,
-          firstname: newUser.rows[0].first_name,
-          lastname: newUser.rows[0].last_name,
-          email: newUser.rows[0].email,
-          id: newUser.rows[0].id,
-          image: newUser.rows[0].img,
-          isAdmin: newUser.rows[0].is_admin,
-        },
-      });
-    } catch (error) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'Network failure',
-      });
-    }
+    return res.status(201).json({
+      status: 'success',
+      data: newBus.rows[0],
+    });
   }
 }
 

@@ -42,14 +42,39 @@ class AuthValidation {
       return res.status(400).send({ error: 'Add a valid image' });
     }
     if (isAdmin && (isAdmin === true)) {
-      next();
-    } else if (isAdmin && (isAdmin === false)) {
-      next();
-    } else if (!isAdmin && !img) {
-      next();
-    } else {
-      return res.status(400).send({ error: 'Admin should be a boolean' });
+      return next();
+    } if (isAdmin && (isAdmin === false)) {
+      return next();
+    } if (!isAdmin && !img) {
+      return next();
     }
+    return res.status(400).send({ error: 'Admin should be a boolean' });
+  }
+
+  /**
+      * Validate login input
+      *
+      * @staticmethod
+      * @param  {object} req - Request object
+      * @param {object} res - Response object
+      * @param {function} next - middleware next (for error handling)
+      * @return {json} res.json
+      */
+  static validateLogin(req, res, next) {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}/;
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+    const {
+      email,
+      password,
+    } = req.body;
+
+    if (typeof email !== 'string' || email.toString().trim() === '' || emailRegex.test(email) === false) {
+      return res.status(400).send({ message: 'Wrong email format' });
+    } if (typeof password !== 'string' || password.toString().trim() === '' || passwordRegex.test(password) === false) {
+      return res.status(400).send({ message: 'Password must contain minimum of eight characters, at least one uppercase letter, one lowercase letter, one number and one special character' });
+    }
+    return next();
   }
 }
 
