@@ -190,7 +190,7 @@ describe('Users Authentication', () => {
             .then((res) => {
                 const body = res.body;
                 userId = body.data.id;
-                expect(res.status).to.equal(201);
+                expect(res.status).to.equal(200);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
                 expect(body.data).to.contain.property('token');
