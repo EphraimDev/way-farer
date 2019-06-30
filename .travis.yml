@@ -12,7 +12,7 @@ env:
     - TEST_DB_HOST=localhost
     - TEST_DB_USER=postgres
     - TEST_DB_DATABASE=wayfarer_test
-    - JWT_KEY
+    - JWT_KEY=secret
 
 before_script:
   - psql -c 'CREATE DATABASE wayfarer_test;' -U postgres
