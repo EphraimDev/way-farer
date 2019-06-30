@@ -24,6 +24,7 @@ CREATE TABLE bus
     year VARCHAR(128) NOT NULL,
     capacity VARCHAR(128) NOT NULL,
     color VARCHAR(128),
+    img VARCHAR(128),
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP

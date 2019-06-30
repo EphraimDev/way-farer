@@ -7,15 +7,15 @@ import Mailer from '../utils/mailer';
 
 /**
  * @exports
- * @class AuthController
+ * @class BusController
  */
-class AuthController {
+class BusController {
   constructor() {
-    this.register = this.signup;
+    this.bus = this.addBus;
   }
 
   /**
-   * Creates a new user
+   * Add a new bus to the database
    * @param  {object} req - Request object
    * @param {object} res - Response object
    * @return {json} res.json
@@ -71,6 +71,6 @@ class AuthController {
   }
 }
 
-const authController = new AuthController();
+const busController = new BusController();
 
-export default authController;
+export default busController;
