@@ -1,9 +1,6 @@
 import bcrypt from 'bcrypt';
-import randomString from 'random-string';
 import Authorization from '../middlewares/auth';
-import Mailer from '../utils/mailer';
 import pool from '../model/db';
-import GUID from '../utils/guid';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 
@@ -51,8 +48,6 @@ class AuthController {
         console.log(newUser.rows[0])
       const token = await Authorization.generateToken(newUser.rows[0]);
         console.log(3)
-      await Mailer.createAccountMessage(email, firstname, lastname);
-        console.log(4)
         
       return res.status(201).json({
         status: 'success',
