@@ -22,7 +22,7 @@ class Mailer {
   static sendMail({ to, subject, message }) {
     // create reusable transporter object
     const transporter = nodemailer.createTransport(config.mail.smtpConfig);
-    
+
     // setup email data
     const mailOptions = {
       from: '"Way Farer" <noreply@wayfarer.com>',

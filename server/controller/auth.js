@@ -25,7 +25,7 @@ class AuthController {
       firstname, lastname, email, password, image, isAdmin,
     } = req.body;
 
-    
+
     const findUser = await pool.query(queryHelper.text, [email]);
 
     if (findUser.rowCount >= 1) {
@@ -36,19 +36,19 @@ class AuthController {
     }
 
     try {
-        const admin = !isAdmin ? false : isAdmin;
-        const img = !image ? "" : image; 
-        const hashedPassword = await bcrypt.hashSync(password, 10);
+      const admin = !isAdmin ? false : isAdmin;
+      const img = !image ? '' : image;
+      const hashedPassword = await bcrypt.hashSync(password, 10);
 
-       await pool.query(queryHelper.createUser,
+      await pool.query(queryHelper.createUser,
         [email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
-       
-        const newUser = await pool.query(queryHelper.text,[email]);
-        
+
+      const newUser = await pool.query(queryHelper.text, [email]);
+
       const token = await Authorization.generateToken(newUser.rows[0]);
 
       Mailer.createAccountMessage(email);
-        
+
       return res.status(201).json({
         status: 'success',
         data: {
@@ -58,7 +58,7 @@ class AuthController {
           email: newUser.rows[0].email,
           id: newUser.rows[0].id,
           image: newUser.rows[0].img,
-          isAdmin: newUser.rows[0].is_admin
+          isAdmin: newUser.rows[0].is_admin,
         },
       });
     } catch (error) {
@@ -83,18 +83,18 @@ class AuthController {
     if (findUser.rowCount < 1) {
       return res.status(404).json({
         status: 'error',
-        error: "User does not exist",
+        error: 'User does not exist',
       });
     }
 
-    
+
     const verify = await AuthController.verifyPassword(password, findUser.rows[0].password);
-    
+
     if (verify === true) {
       const token = await Authorization.generateToken(findUser.rows[0]);
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           token,
           firstname: findUser.rows[0].first_name,
@@ -102,12 +102,12 @@ class AuthController {
           email: findUser.rows[0].email,
           id: findUser.rows[0].id,
           image: findUser.rows[0].img,
-          isAdmin: findUser.rows[0].is_admin
+          isAdmin: findUser.rows[0].is_admin,
         },
       });
     }
     return res.status(401).json({
-      status: "error",
+      status: 'error',
       error: 'Email or password incorrect',
     });
   }
