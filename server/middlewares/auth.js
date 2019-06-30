@@ -33,9 +33,7 @@ class Authorization {
         expiresIn: '48h',
       },
     );
-
-    this.token = token;
-
+    
     return token;
   }
 

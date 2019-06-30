@@ -1,11 +1,9 @@
 import bcrypt from 'bcrypt';
-import randomString from 'random-string';
 import Authorization from '../middlewares/auth';
-import Mailer from '../utils/mailer';
 import pool from '../model/db';
-import GUID from '../utils/guid';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
+import Mailer from '../utils/mailer';
 
 /**
  * @exports
@@ -45,13 +43,12 @@ class AuthController {
 
        await pool.query(queryHelper.createUser,
         [email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
-        
+       
         const newUser = await pool.query(queryHelper.text,[email]);
         
       const token = await Authorization.generateToken(newUser.rows[0]);
-        
-      await Mailer.createAccountMessage(email, firstname, lastname);
-        
+
+      Mailer.createAccountMessage(email);
         
       return res.status(201).json({
         status: 'success',
