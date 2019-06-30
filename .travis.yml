@@ -9,6 +9,10 @@ env:
   global:
     - CC_TEST_REPORTER_ID=a132ae997f0a83be832e6ec6e8ef2bceada65c6b38794d41333b5fe80c175167
     - TEST_DB_PASS=
+    - TEST_DB_HOST=localhost
+    - TEST_DB_USER=postgres
+    - TEST_DB_DATABASE=wayfarer_test
+    - JWT_KEY
 
 before_script:
   - psql -c 'CREATE DATABASE wayfarer_test;' -U postgres
