@@ -190,7 +190,7 @@ describe('Users Authentication', () => {
             .then((res) => {
                 const body = res.body;
                 userId = body.data.id;
-                expect(res.status).to.equal(201);
+                expect(res.status).to.equal(200);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
                 expect(body.data).to.contain.property('token');
@@ -209,12 +209,31 @@ describe('Users Authentication', () => {
             })
             .then((res) => {
                 const body = res.body;
-                expect(res.status).to.equal(400);
+                expect(res.status).to.equal(404);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('error');
                 expect(body.status).to.equal("error");
                 expect(body.error).to.be.a("string");
                 expect(body.error).to.equal("User does not exist");
+                done()
+            })
+        });
+
+        it('should for wrong email-password combination', (done) => {
+            chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+                email: "test@test.co",
+                password: "Password1!r"
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(401);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("Email or password incorrect");
                 done()
             })
         });

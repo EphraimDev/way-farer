@@ -28,7 +28,6 @@ class AuthController {
     
     const findUser = await pool.query(queryHelper.text, [email]);
 
-    //console.log(findUser)
     if (findUser.rowCount >= 1) {
       return res.status(409).json({
         status: 'error',
@@ -68,6 +67,60 @@ class AuthController {
         error: 'Network failure',
       });
     }
+  }
+
+  /**
+   * Login a user
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  async login(req, res) {
+    const { email, password } = req.body;
+
+    const findUser = await pool.query(queryHelper.text, [email]);
+
+    if (findUser.rowCount < 1) {
+      return res.status(404).json({
+        status: 'error',
+        error: "User does not exist",
+      });
+    }
+
+    
+    const verify = await AuthController.verifyPassword(password, findUser.rows[0].password);
+    
+    if (verify === true) {
+      const token = await Authorization.generateToken(findUser.rows[0]);
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          token,
+          firstname: findUser.rows[0].first_name,
+          lastname: findUser.rows[0].last_name,
+          email: findUser.rows[0].email,
+          id: findUser.rows[0].id,
+          image: findUser.rows[0].img,
+          isAdmin: findUser.rows[0].is_admin
+        },
+      });
+    }
+    return res.status(401).json({
+      status: "error",
+      error: 'Email or password incorrect',
+    });
+  }
+
+  /**
+   * @method verifyPassword
+   * @memberof Users
+   * @param {string} password
+   * @param {string} hash
+   * @return {Promise} Promise of true or false
+   */
+  static verifyPassword(password, hash) {
+    return bcrypt.compare(password, hash);
   }
 }
 

@@ -64,6 +64,50 @@ class Authorization {
       });
     }
   }
+
+  /**
+   * @method checkTokenExists
+   * @memberof Authorization
+   * @param {object} req
+   * @param {object} res
+   * @param {function} next
+   * @returns {(function|object)} Function next() or JSON object
+   */
+  checkTokenExists(req, res, next) {
+    const { Authorization } = req.headers;
+    
+    if (!Authorization) {
+      return res.status(400).json({
+        status: "error",
+        error: 'No token available'
+      });
+    }
+
+    return next();
+  }
+
+  /**
+   * @method checkAdmin
+   * @memberof Authorization
+   * @param {object} req
+   * @param {object} res
+   * @param {function} next
+   * @returns {(function|object)} Function next() or JSON object
+   */
+  checkAdmin(req, res, next) {
+    const { Authorization } = req.headers;
+
+    const decoded = jwt.decode(Authorization);
+    if (decoded.admin) {
+      return next();
+    }
+    else{
+      return res.status(401).json({
+        error: 'Only Admin Access',
+        status: "error"
+      })
+    }
+  }
 }
 const authorization = new Authorization();
 export default authorization;
