@@ -1,4 +1,5 @@
-CREATE TYPE action AS ENUM ('Active', 'Cancelled', 'Started', 'Ended');
+CREATE TYPE action AS ENUM
+('Active', 'Cancelled', 'Ended');
 
 CREATE TABLE users
 (
@@ -33,12 +34,11 @@ CREATE TABLE bus
 CREATE TABLE trip
 (
     id SERIAL PRIMARY KEY,
-    user_id SERIAL REFERENCES users(id) NOT NULL,
     bus_id SERIAL REFERENCES bus(id) NOT NULL,
     origin VARCHAR(500) NOT NULL,
     destination VARCHAR(500) NOT NULL,
-    trip_date VARCHAR(50) NOT NULL,
-    trip_time VARCHAR(50) NOT NULL,
+    trip_date DATE NOT NULL,
+    trip_time TIME NOT NULL,
     fare VARCHAR(128) NOT NULL,
     status action default 'Active',
     created_at TIMESTAMP,
@@ -46,7 +46,8 @@ CREATE TABLE trip
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE booking(
+CREATE TABLE booking
+(
     id SERIAL PRIMARY KEY,
     user_id SERIAL REFERENCES users(id) NOT NULL,
     trip_id SERIAL REFERENCES trip(id) NOT NULL,

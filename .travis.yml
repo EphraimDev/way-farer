@@ -7,7 +7,7 @@ services:
 
 env:
   global:
-    - CC_TEST_REPORTER_ID=a132ae997f0a83be832e6ec6e8ef2bceada65c6b38794d41333b5fe80c175167
+    - CC_TEST_REPORTER_ID=afe0dc4811f07679b005aa43f0e1fec65fc9d1cda33042a4ab9267d6fd08bb6a
     - TEST_DB_PASS=
     - TEST_DB_HOST=localhost
     - TEST_DB_USER=postgres

@@ -5,7 +5,7 @@ import auth from '../controller/auth';
 
 const router = express.Router();
 
-router.post('/signup', validate.validateSignUp, auth.register);
+router.post('/signup', validate.validateSignUp, auth.signup);
 router.post('/login', validate.validateLogin, auth.login);
 
 export default router;

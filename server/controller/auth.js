@@ -10,17 +10,13 @@ import Mailer from '../utils/mailer';
  * @class AuthController
  */
 class AuthController {
-  constructor() {
-    this.register = this.signup;
-  }
-
   /**
    * Creates a new user
    * @param  {object} req - Request object
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  async signup(req, res) {
+  static async signup(req, res) {
     const {
       firstname, lastname, email, password, image, isAdmin,
     } = req.body;
@@ -75,7 +71,7 @@ class AuthController {
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  async login(req, res) {
+  static async login(req, res) {
     const { email, password } = req.body;
 
     const findUser = await pool.query(queryHelper.text, [email]);
@@ -124,6 +120,4 @@ class AuthController {
   }
 }
 
-const authController = new AuthController();
-
-export default authController;
+export default AuthController;

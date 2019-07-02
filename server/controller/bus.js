@@ -19,11 +19,11 @@ class BusController {
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  async addBus(req, res) {
+  static async addBus(req, res) {
     const {
       numberPlate, manufacturer, model, year, capacity, color, image,
     } = req.body;
-    
+
     if (req.user.is_admin !== true) {
       return res.status(401).json({
         status: 'error',
@@ -55,6 +55,4 @@ class BusController {
   }
 }
 
-const busController = new BusController();
-
-export default busController;
+export default BusController;
