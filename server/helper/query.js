@@ -6,6 +6,7 @@ const query = {
   addTrip: 'INSERT INTO trip(bus_id, origin, destination, trip_date, trip_time, fare, status, created_at) values($1,$2,$3,$4,$5,$6,$7,$8)',
   getTrip: 'SELECT * FROM trip WHERE bus_id = $1 AND status = $2',
   getBusById: 'SELECT * FROM bus WHERE id = $1',
+  cancelTrip: 'UPDATE trip SET status = ($1), updated_at = ($2) WHERE id = ($3)',
 };
 
 export default query;
