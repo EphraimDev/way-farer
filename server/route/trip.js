@@ -6,5 +6,6 @@ import authorization from '../middlewares/auth';
 const router = express.Router();
 
 router.post('/', authorization.authorize, validate.add, trips.addTrip);
+router.delete('/:tripId', trips.cancelTrip);
 
 export default router;
