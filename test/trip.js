@@ -1,86 +1,277 @@
-// import { describe, it } from 'mocha';
-// import chai,{expect} from 'chai';
-// import chaiHttp from 'chai-http';
+import { describe, it } from 'mocha';
+import chai, { expect } from 'chai';
+import chaiHttp from 'chai-http';
 
-// import app from '../app';
-// import { type } from 'os';
+import app from '../app';
 
-// chai.should();
+chai.should();
 
-// chai.use(chaiHttp);
-// let tripId = '';
+chai.use(chaiHttp);
+let token = 'bearer ';
+let notAdmin = 'bearer ';
 
-// describe('Trips', () => {
-//     describe('POST /api/v1/trips', () => {
-//         it('should create a trip',  (done) => {
-//             chai.request(app)
-//             .post('/api/v1/trips/create')
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 origin: "Ikeja",
-//                 destination: "CMS",
-//                 trip_date: "10/12/2019",
-//                 trip_time: "4:21:38 AM",
-//                 fare: 500.00
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 tripId = body.data.id;
-//                 expect(res.status).to.equal(201);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('data');
-//                 expect(body.data).to.contain.property('id');
-//                 expect(body.status).to.equal("success");
-//                 expect(body.data).to.be.an("object");
-//                 done()
-//             })
-//         });
+describe('Trips', () => {
+  describe('Get tokens', () => {
+    it('should add a user', (done) => {
+      chai.request(app)
+        .post('/api/v1/auth/login')
+        .send({
+          email: 'non@test.co',
+          password: 'Password1!',
+        })
+        .then((res) => {
+          const { body } = res;
+          notAdmin += body.data.token;
 
-//         it('should check for trip that already exists', (done) => {
-//             chai.request(app)
-//             .post('/api/v1/trips/create')
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 origin: "Ikeja",
-//                 destination: "CMS",
-//                 trip_date: "10/12/2019",
-//                 trip_time: "8:21:38 AM",
-//                 fare: 500.00
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This bus has an active trip");
-//                 done()
-//             })
-//         });
+          done();
+        });
+    });
 
-//         it('should check for incomplete data', (done) => {
-//             chai.request(app)
-//             .post('/api/v1/trips/create')
-//             .send({
-//                 bus_id: "FBC12DE",
-//                 destination: "CMS",
-//                 trip_date: "10/12/2019",
-//                 fare: 500.00,
-//                 status: "active"
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("Some important data are missing");
-//                 done()
-//             })
-//         });
-//     });
+    it('should log in a user', (done) => {
+      chai.request(app)
+        .post('/api/v1/auth/login')
+        .send({
+          email: 'test@test.co',
+          password: 'Password1!',
+        })
+        .then((res) => {
+          const { body } = res;
+          token += body.data.token;
+
+          done();
+        });
+    });
+  });
+  describe('POST /api/v1/trips', () => {
+    it('should create a trip', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(201);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.data).to.contain.property('id');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('object');
+          done();
+        });
+    });
+
+    it('should check for trip that already exists', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(409);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('A trip with this bus is active');
+          done();
+        });
+    });
+
+    it('should check for wrong bus ID', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 10,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(409);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Selected bus does not exist');
+          done();
+        });
+    });
+
+    it('should check admin access', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', notAdmin)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(401);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Admin access only');
+          done();
+        });
+    });
+
+    it('should check for wrong bus id', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: '1',
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Bus ID is a number');
+          done();
+        });
+    });
+
+    it('should check for wrong trip origin format', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 2,
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Origin is a string');
+          done();
+        });
+    });
+
+    it('should check for wrong destination format', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 1,
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Destination is a string');
+          done();
+        });
+    });
+
+    it('should check for date format', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: 24,
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Trip date is a string in format yyyy-mm-dd');
+          done();
+        });
+    });
+
+    it('should check for time format', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: 2,
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Trip time is a string in format hh:mm:ss');
+          done();
+        });
+    });
+
+    it('should check for fare format', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '10/12/2019',
+          tripTime: '4:21:38 AM',
+          fare: '500.00',
+        })
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Fare must be a number');
+          done();
+        });
+    });
+  });
+});
 
 //     describe('PUT /api/v1/trips/modify/:tripId', () => {
 //         it('should modify a trip',  (done) => {
@@ -334,4 +525,3 @@
 //             })
 //         });
 //     });
-// })

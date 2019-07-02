@@ -4,7 +4,7 @@
  */
 class BusValidation {
   /**
-          * Validate sign up input
+          * Validate add bus input
           *
           * @staticmethod
           * @param  {object} req - Request object
