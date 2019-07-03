@@ -12,7 +12,7 @@ let userId = "";
 
 describe('Users Authentication', () => {
     describe('POST /api/v1/auth/signup', () => {
-        it('should add a user',  (done) => {
+        it('should add an admin user',  (done) => {
             chai.request(app)
             .post('/api/v1/auth/signup')
             .send({
@@ -34,6 +34,27 @@ describe('Users Authentication', () => {
                 done()
             })
         });
+
+        it('should add a user', (done) => {
+            chai.request(app)
+              .post('/api/v1/auth/signup')
+              .send({
+                email: 'non@test.co',
+                firstname: 'Way',
+                lastname: 'Farer',
+                password: 'Password1!',
+              })
+              .then((res) => {
+                const { body } = res;
+                expect(res.status).to.equal(201);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('data');
+                expect(body.data).to.contain.property('token');
+                expect(body.status).to.equal("success");
+                expect(body.data).to.be.an("object");
+                done();
+              });
+          });
 
         it('should check if user exists',  (done) => {
             chai.request(app)

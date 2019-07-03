@@ -1,6 +1,7 @@
 import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
+import guid from '../utils/guid';
 
 /**
  * @exports
@@ -19,6 +20,8 @@ class BookingController {
     const {
       tripId, seat,
     } = req.body;
+
+    const bookId = guid.formGuid();
 
     const findTrip = await pool.query(queryHelper.getTripById, [tripId]);
 
@@ -40,17 +43,17 @@ class BookingController {
       });
     }
 
-    const { bus_id } = findTrip.rows[0];
+   const { bus_id } = findTrip.rows[0];
     const bus = await pool.query(queryHelper.getBusById, [bus_id]);
     const { capacity } = bus.rows[0];
     const booked = await pool.query(queryHelper.allTripBooking, [tripId]);
 
-    // if (capacity <= booked.rowCount) {
-    //   return res.status(400).json({
-    //     status: 'error',
-    //     error: 'Selected trip is completely booked',
-    //   });
-    // }
+    if (capacity <= booked.rowCount) {
+      return res.status(400).json({
+        status: 'error',
+        error: 'Selected trip is completely booked',
+      });
+    }
     // console.log(capacity);
     // const available = Math.floor(Math.random() * capacity) + 1;
     // console.log(available);
@@ -66,12 +69,12 @@ class BookingController {
       });
     }
 
-    const { id } = req.user;
+    const { user_id } = req.user;
 
     await pool.query(queryHelper.bookTrip,
-      [id, tripId, seat, moment.createdAt]);
+      [bookId, user_id, tripId, seat, moment.createdAt]);
 
-    const newBooking = await pool.query(queryHelper.getBooking, [tripId, id]);
+    const newBooking = await pool.query(queryHelper.getBooking, [bookId]);
 
     return res.status(201).json({
       status: 'success',

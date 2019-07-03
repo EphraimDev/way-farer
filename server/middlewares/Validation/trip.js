@@ -16,8 +16,9 @@ class TripValidation {
     const {
       busId, origin, destination, tripDate, tripTime, fare,
     } = req.body;
-    if (typeof busId !== 'number') {
-      return res.status(400).json({ error: 'Bus ID is a number' });
+    
+    if (busId.length < 1 || typeof busId !== 'string' ) {
+      return res.status(400).json({ error: 'Bus ID is a string' });
     }
     if (typeof origin !== 'string' || origin.toString().trim() === '') {
       return res.status(400).send({ error: 'Origin is a string' });

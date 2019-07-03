@@ -24,7 +24,7 @@ class Authorization {
   async generateToken(user) {
     const token = jwt.sign(
       {
-        userId: user.id,
+        userId: user.user_id,
         email: user.email,
         password: user.password,
         admin: user.is_admin,

@@ -10,6 +10,7 @@ chai.use(chaiHttp);
 let token = 'bearer ';
 let notAdmin = 'bearer ';
 let tripId;
+let busId;
 
 describe('Trips', () => {
   describe('Get tokens', () => {
@@ -59,12 +60,31 @@ describe('Trips', () => {
           done();
         });
     });
+
+    it('should add a bus', (done) => {
+      chai.request(app)
+        .post('/api/v1/bus')
+        .set('authorization', token)
+        .send({
+          numberPlate: 'ABC123DERE',
+          manufacturer: 'Toyota',
+          model: 'Siena',
+          year: 2008,
+          capacity: 5,
+        })
+        .then((res) => {
+          const { body } = res;
+          busId = body.data.bus_id
+          done();
+        });
+    });
+
     it('should create a trip', (done) => {
       chai.request(app)
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: busId,
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -73,7 +93,7 @@ describe('Trips', () => {
         })
         .then((res) => {
           const { body } = res;
-          tripId = body.data.id;
+          tripId = body.data.trip_id;
           expect(res.status).to.equal(201);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('data');
@@ -89,7 +109,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: busId,
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -108,12 +128,12 @@ describe('Trips', () => {
         });
     });
 
-    it('should check for wrong bus ID', (done) => {
+    it('should check for bus that does not exist', (done) => {
       chai.request(app)
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 10,
+          busId: 'e1127021-20f0-a61f-9575',
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -137,7 +157,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', notAdmin)
         .send({
-          busId: 1,
+          busId: 'e1127021-20f0-a61f-9575-801f369d9fda',
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -161,7 +181,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: '1',
+          busId: 1,
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -173,7 +193,7 @@ describe('Trips', () => {
           expect(res.status).to.equal(400);
           expect(body).to.contain.property('error');
           expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Bus ID is a number');
+          expect(body.error).to.equal('Bus ID is a string');
           done();
         });
     });
@@ -183,7 +203,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: '1',
           origin: 2,
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -205,7 +225,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: '1',
           origin: 'Ikeja',
           destination: 1,
           tripDate: '10/12/2019',
@@ -227,7 +247,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: '1',
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: 24,
@@ -249,7 +269,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: '1',
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -271,7 +291,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: '1',
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '10/12/2019',
@@ -290,6 +310,7 @@ describe('Trips', () => {
   });
 
   describe('DELETE /api/v1/trips/:tripId', () => {
+    console.log(tripId)
     it('should cancel a trip', (done) => {
       chai.request(app)
         .delete(`/api/v1/trips/${tripId}`)
@@ -340,7 +361,7 @@ describe('Trips', () => {
         .post('/api/v1/trips')
         .set('authorization', token)
         .send({
-          busId: 1,
+          busId: busId,
           origin: 'Ikeja',
           destination: 'CMS',
           tripDate: '2019-01-01',
@@ -349,7 +370,7 @@ describe('Trips', () => {
         })
         .then((res) => {
           const { body } = res;
-          tripId = body.data.id;
+          tripId = body.data.trip_id;
           done();
         });
     });
