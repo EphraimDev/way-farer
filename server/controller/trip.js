@@ -99,6 +99,30 @@ class TripController {
       data: cancelTrip.rows[0],
     });
   }
+
+  /**
+   * Fetch all trips
+   * @staticmethod
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @param {function} next - middleware next (for error handling)
+   * @return {json} res.json
+   */
+  static async getAllTrips(req, res) {
+    const trips = await pool.query(queryHelper.allTrips, []);
+
+    if (trips.rowCount <= 0) {
+      return res.status(404).json({
+        status: 'error',
+        error: 'There are no trips',
+      });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: trips.rows,
+    });
+  }
 }
 
 export default TripController;

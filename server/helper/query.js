@@ -8,6 +8,7 @@ const query = {
   getTripById: 'SELECT * FROM trip WHERE id = $1',
   getBusById: 'SELECT * FROM bus WHERE id = $1',
   cancelTrip: 'UPDATE trip SET status = ($1), updated_at = ($2) WHERE id = ($3)',
+  allTrips: 'SELECT * FROM trip',
 };
 
 export default query;
