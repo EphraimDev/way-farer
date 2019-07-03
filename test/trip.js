@@ -44,6 +44,21 @@ describe('Trips', () => {
     });
   });
   describe('POST /api/v1/trips', () => {
+    it('should return all trips', (done) => {
+      chai.request(app)
+        .get('/api/v1/trips')
+        .set('authorization', token)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(404);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('There are no trips');
+          done();
+        });
+    });
     it('should create a trip', (done) => {
       chai.request(app)
         .post('/api/v1/trips')
@@ -355,24 +370,25 @@ describe('Trips', () => {
         });
     });
   });
+
+  describe('GET /api/v1/trips', () => {
+    it('should return all trips', (done) => {
+      chai.request(app)
+        .get('/api/v1/trips')
+        .set('authorization', token)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(200);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('array');
+          done();
+        });
+    });
+  });
 });
 
-
-//     describe('GET /api/v1/trips/all', () => {
-//         it('should return all trips',  (done) => {
-//             chai.request(app)
-//             .get('/api/v1/trip/all')
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(200);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('data');
-//                 expect(body.status).to.equal("success");
-//                 expect(body.data).to.be.an("object");
-//                 done()
-//             })
-//         });
-//     });
 
 //     describe('GET /api/v1/trips/trip/:tripId', () => {
 //         it('should get the details of a trip',  (done) => {
