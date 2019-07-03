@@ -55,6 +55,50 @@ class TripController {
       data: newTrip.rows[0],
     });
   }
+
+  /**
+   * Admin cancel trip
+   * @staticmethod
+   * @method cancelTrip
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async cancelTrip(req, res) {
+    const { tripId } = req.params;
+
+    if (req.user.is_admin !== true) {
+      return res.status(401).json({
+        status: 'error',
+        error: 'Admin access only',
+      });
+    }
+
+    const findTrip = await pool.query(queryHelper.getTripById, [tripId]);
+    if (findTrip.rowCount < 1) {
+      return res.status(404).json({
+        status: 'error',
+        error: 'Trip does not exist',
+      });
+    }
+
+    const todaydate = new Date().getTime();
+    const tripDate = new Date(findTrip.rows[0].trip_date).getTime();
+
+    if (tripDate <= todaydate || findTrip.rows[0] === 'Ended') {
+      return res.status(400).json({
+        status: 'error',
+        error: 'Trip cannot be cancelled',
+      });
+    }
+
+    const cancelTrip = await pool.query(queryHelper.cancelTrip, ['Cancelled', moment.updatedAt, findTrip.rows[0].id]);
+
+    return res.status(200).json({
+      status: 'success',
+      data: cancelTrip.rows[0],
+    });
+  }
 }
 
 export default TripController;

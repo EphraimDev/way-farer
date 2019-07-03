@@ -9,6 +9,7 @@ chai.should();
 chai.use(chaiHttp);
 let token = 'bearer ';
 let notAdmin = 'bearer ';
+let tripId;
 
 describe('Trips', () => {
   describe('Get tokens', () => {
@@ -57,6 +58,7 @@ describe('Trips', () => {
         })
         .then((res) => {
           const { body } = res;
+          tripId = body.data.id;
           expect(res.status).to.equal(201);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('data');
@@ -271,96 +273,90 @@ describe('Trips', () => {
         });
     });
   });
+
+  describe('DELETE /api/v1/trips/:tripId', () => {
+    it('should cancel a trip', (done) => {
+      chai.request(app)
+        .delete(`/api/v1/trips/${tripId}`)
+        .set('authorization', token)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(200);
+          expect(body).to.contain.property('status');
+          expect(body.status).to.equal('success');
+          done();
+        });
+    });
+
+    it('should check admin access', (done) => {
+      chai.request(app)
+        .delete('/api/v1/trips/1')
+        .set('authorization', notAdmin)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(401);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Admin access only');
+          done();
+        });
+    });
+
+    it("should fail for trips that don't exists", (done) => {
+      chai.request(app)
+        .delete('/api/v1/trips/5')
+        .set('authorization', token)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(404);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Trip does not exist');
+          done();
+        });
+    });
+
+    it('should create a trip', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          busId: 1,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          tripDate: '2019-01-01',
+          tripTime: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          tripId = body.data.id;
+          done();
+        });
+    });
+
+    it('should check for trip that cannot be canceled', (done) => {
+      chai.request(app)
+        .delete(`/api/v1/trips/${tripId}`)
+        .set('authorization', token)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Trip cannot be cancelled');
+          done();
+        });
+    });
+  });
 });
 
-//     describe('PUT /api/v1/trips/modify/:tripId', () => {
-//         it('should modify a trip',  (done) => {
-//             chai.request(app)
-//             .put(`/api/v1/trips/modify/${tripId}`)
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 origin: "Ikeja",
-//                 destination: "Oshodi",
-//                 trip_date: "10/12/2019",
-//                 trip_time: "4:21:38 AM",
-//                 fare: 500.00
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(200);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('data');
-//                 expect(body.data).to.contain.property('id');
-//                 expect(body.status).to.equal("success");
-//                 expect(body.data).to.be.an("object");
-//                 done()
-//             })
-//         });
-
-//         it("should fail for trips that don't exists", (done) => {
-//             chai.request(app)
-//             .put('/api/v1/trips/modify/none')
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 origin: "Ikeja",
-//                 destination: "CMS",
-//                 trip_date: "10/12/2019",
-//                 fare: 500.00
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(404);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This trip does not exist");
-//                 done()
-//             })
-//         });
-
-//         it('should check for trip that has been canceled', (done) => {
-//             chai.request(app)
-//             .put('/api/v1/trips/modify/2')
-//             .send({
-//                 bus_id: "FBC22DE",
-//                 destination: "CMS",
-//                 trip_date: "10/12/2019",
-//                 fare: 500.00
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This trip has been canceled");
-//                 done()
-//             })
-//         });
-
-//         it('should check for trip that has started', (done) => {
-//             chai.request(app)
-//             .put('/api/v1/trips/modify/2')
-//             .send({
-//                 bus_id: "FBC22DE",
-//                 destination: "CMS",
-//                 trip_date: "10/12/2019",
-//                 fare: 500.00
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This trip has started already");
-//                 done()
-//             })
-//         });
-//     });
 
 //     describe('GET /api/v1/trips/all', () => {
 //         it('should return all trips',  (done) => {
