@@ -15,7 +15,7 @@
     "test:db": "npm run test:drop && npm run test:create",
     "eslint:init": "./node_modules/.bin/eslint --init",
     "eslint": "./node_modules/.bin/eslint --fix ./server/**/*.js",
-    "test": "cross-env NODE_ENV=test nyc mocha --require @babel/register --timeout 6000 test/*.js --exit",
+    "test": "cross-env NODE_ENV=test nyc mocha --require @babel/register --timeout 6000 test/index.js --exit",
     "test:dev": "npm run test:db && npm test && npm run coverage",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },

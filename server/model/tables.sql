@@ -11,8 +11,7 @@ CREATE TABLE users
     img VARCHAR(128),
     is_admin BOOLEAN NOT NULL,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE bus
@@ -27,8 +26,7 @@ CREATE TABLE bus
     color VARCHAR(128),
     img VARCHAR(500),
     created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE trip
@@ -42,8 +40,7 @@ CREATE TABLE trip
     fare VARCHAR(128) NOT NULL,
     status action default 'Active',
     created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE booking
@@ -51,7 +48,7 @@ CREATE TABLE booking
     id SERIAL PRIMARY KEY,
     user_id SERIAL REFERENCES users(id) NOT NULL,
     trip_id SERIAL REFERENCES trip(id) NOT NULL,
+    seat_number INT,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
+    updated_at TIMESTAMP
 );
