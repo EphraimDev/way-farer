@@ -334,14 +334,14 @@ describe('Trips', () => {
         })
         .then((res) => {
           const { body } = res;
-          tripId = body.data.bus;
+          tripId = body.data.id;
           done();
         });
     });
 
     it('should check for trip that cannot be canceled', (done) => {
       chai.request(app)
-        .delete('/api/v1/trips/1')
+        .delete(`/api/v1/trips/${tripId}`)
         .set('authorization', token)
         .then((res) => {
           const { body } = res;

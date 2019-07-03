@@ -74,7 +74,7 @@ class TripController {
       });
     }
 
-    const findTrip = await pool.query(queryHelper.getTrip, [tripId, 'Active']);
+    const findTrip = await pool.query(queryHelper.getTripById, [tripId]);
     if (findTrip.rowCount < 1) {
       return res.status(404).json({
         status: 'error',
