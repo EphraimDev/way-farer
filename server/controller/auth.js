@@ -4,6 +4,7 @@ import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 import Mailer from '../utils/mailer';
+import GUID from '../utils/guid';
 
 /**
  * @exports
@@ -21,6 +22,7 @@ class AuthController {
       firstname, lastname, email, password, image, isAdmin,
     } = req.body;
 
+const userId = GUID.formGuid();
 
     const findUser = await pool.query(queryHelper.text, [email]);
 
@@ -35,9 +37,9 @@ class AuthController {
       const admin = !isAdmin ? false : isAdmin;
       const img = !image ? '' : image;
       const hashedPassword = await bcrypt.hashSync(password, 10);
-
+      
       await pool.query(queryHelper.createUser,
-        [email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
+        [userId, email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
 
       const newUser = await pool.query(queryHelper.text, [email]);
 
@@ -52,7 +54,7 @@ class AuthController {
           firstname: newUser.rows[0].first_name,
           lastname: newUser.rows[0].last_name,
           email: newUser.rows[0].email,
-          id: newUser.rows[0].id,
+          id: newUser.rows[0].user_id,
           image: newUser.rows[0].img,
           isAdmin: newUser.rows[0].is_admin,
         },
@@ -96,7 +98,7 @@ class AuthController {
           firstname: findUser.rows[0].first_name,
           lastname: findUser.rows[0].last_name,
           email: findUser.rows[0].email,
-          id: findUser.rows[0].id,
+          id: findUser.rows[0].user_id,
           image: findUser.rows[0].img,
           isAdmin: findUser.rows[0].is_admin,
         },

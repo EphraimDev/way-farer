@@ -15,17 +15,14 @@ describe('Buses', () => {
   describe('Get tokens', () => {
     it('should add a user', (done) => {
       chai.request(app)
-        .post('/api/v1/auth/signup')
+        .post('/api/v1/auth/login')
         .send({
           email: 'non@test.co',
-          firstname: 'Way',
-          lastname: 'Farer',
           password: 'Password1!',
         })
         .then((res) => {
           const { body } = res;
           notAdmin += body.data.token;
-
           done();
         });
     });

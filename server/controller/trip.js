@@ -1,6 +1,7 @@
 import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
+import guid from '../utils/guid';
 
 /**
  * @exports
@@ -20,7 +21,9 @@ class TripController {
       busId, origin, destination, tripDate, tripTime, fare,
     } = req.body;
 
-    if (req.user.is_admin !== true) {
+    const tripId = guid.formGuid();
+
+    if (req.user === undefined || req.user.is_admin !== true) {
       return res.status(401).json({
         status: 'error',
         error: 'Admin access only',
@@ -36,7 +39,7 @@ class TripController {
       });
     }
 
-    const findActiveBus = await pool.query(queryHelper.getTrip, [busId, 'Active']);
+    const findActiveBus = await pool.query(queryHelper.getActiveBus, [busId, 'Active']);
 
     if (findActiveBus.rowCount >= 1) {
       return res.status(409).json({
@@ -44,11 +47,11 @@ class TripController {
         error: 'A trip with this bus is active',
       });
     }
-
+    
     await pool.query(queryHelper.addTrip,
-      [busId, origin, destination, tripDate, tripTime, fare, 'Active', moment.createdAt]);
+      [tripId, req.user.user_id, busId, origin, destination, tripDate, tripTime, fare, 'Active', moment.createdAt]);
 
-    const newTrip = await pool.query(queryHelper.getTrip, [busId, 'Active']);
+    const newTrip = await pool.query(queryHelper.getTrip, [tripId]);
 
     return res.status(201).json({
       status: 'success',
@@ -67,7 +70,7 @@ class TripController {
   static async cancelTrip(req, res) {
     const { tripId } = req.params;
 
-    if (req.user.is_admin !== true) {
+    if (req.user === undefined ||req.user.is_admin !== true) {
       return res.status(401).json({
         status: 'error',
         error: 'Admin access only',
@@ -92,7 +95,7 @@ class TripController {
       });
     }
 
-    const cancelTrip = await pool.query(queryHelper.cancelTrip, ['Cancelled', moment.updatedAt, findTrip.rows[0].id]);
+    const cancelTrip = await pool.query(queryHelper.cancelTrip, ['Cancelled', moment.updatedAt, findTrip.rows[0].trip_id]);
 
     return res.status(200).json({
       status: 'success',

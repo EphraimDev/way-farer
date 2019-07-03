@@ -1,6 +1,7 @@
 import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
+import guid from '../utils/guid';
 
 /**
  * @exports
@@ -24,7 +25,9 @@ class BusController {
       numberPlate, manufacturer, model, year, capacity, color, image,
     } = req.body;
 
-    if (req.user.is_admin !== true) {
+    const busId = guid.formGuid();
+    
+    if (req.user === undefined || req.user.is_admin !== true) {
       return res.status(401).json({
         status: 'error',
         error: 'Admin access only',
@@ -43,7 +46,7 @@ class BusController {
     const img = !image ? '' : image;
 
     await pool.query(queryHelper.addBus,
-      [req.user.id, numberPlate, manufacturer,
+      [busId, req.user.user_id, numberPlate, manufacturer,
         model, year, capacity, color, img, moment.createdAt]);
 
     const newBus = await pool.query(queryHelper.getBus, [numberPlate]);
