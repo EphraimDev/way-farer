@@ -1,127 +1,204 @@
-// import { describe, it } from 'mocha';
-// import chai,{expect} from 'chai';
-// import chaiHttp from 'chai-http';
+import { describe, it } from 'mocha';
+import chai,{expect} from 'chai';
+import chaiHttp from 'chai-http';
 
-// import app from '../app';
+import app from '../app';
 
-// chai.should();
+chai.should();
 
-// chai.use(chaiHttp);
-// let tripId = '';
+chai.use(chaiHttp);
+let token = 'bearer ';
+let notAdmin = 'bearer ';
+let tripId;
+let busId;
 
-// describe('Bookings', () => {
-//     describe('POST /api/v1/booking/create', () => {
-//         it('should book a trip',  (done) => {
-//             chai.request(app)
-//             .post('/api/v1/booking/create')
-//             .set('Authorization', token)
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 trip_id: "CMS",
-//                 created_on: "10/12/2019",
-//                 seat_no: 3
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 tripId = body.data.id;
-//                 expect(res.status).to.equal(201);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('data');
-//                 expect(body.data).to.contain.property('id');
-//                 expect(body.status).to.equal("success");
-//                 expect(body.data).to.be.an("object");
-//                 done()
-//             })
-//         });
+describe('Bookings', () => {
+    describe('Get tokens', () => {
+        it('should login a non-admin', (done) => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email: 'non@test.co',
+              password: 'Password1!',
+            })
+            .then((res) => {
+              const { body } = res;
+              notAdmin += body.data.token;
+    
+              done();
+            });
+        });
+    
+        it('should log in an admin', (done) => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email: 'test@test.co',
+              password: 'Password1!',
+            })
+            .then((res) => {
+              const { body } = res;
+              token += body.data.token;
+    
+              done();
+            });
+        });
+      });
 
-//         it('should check for trip that has started already', (done) => {
-//             chai.request(app)
-//             .post('/api/v1/booking/create')
-//             .set('Authorization', token)
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 trip_id: "CMS",
-//                 created_on: "10/12/2019",
-//                 seat_no: 3
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This trip has started already");
-//                 done()
-//             })
-//         });
+    describe('POST /api/v1/bookings', () => {
+        it('should add a bus', (done) => {
+            chai.request(app)
+              .post('/api/v1/bus')
+              .set('authorization', token)
+              .send({
+                numberPlate: 'ABC123DEQ',
+                manufacturer: 'Toyota',
+                model: 'Siena',
+                year: 2008,
+                capacity: 5,
+              })
+              .then((res) => {
+                const { body } = res;
+                busId = body.data.id;
+                done();
+              });
+          });
+        it('should create a trip', (done) => {
+            chai.request(app)
+              .post('/api/v1/trips')
+              .set('authorization', token)
+              .send({
+                busId,
+                origin: 'Ikeja',
+                destination: 'CMS',
+                tripDate: '2020-02-01',
+                tripTime: '4:21:38 AM',
+                fare: 500.00,
+              })
+              .then((res) => {
+                const { body } = res;
+                tripId = body.data.id;
+                done();
+              });
+          });
 
-//         it('should check for trip that does not exist', (done) => {
-//             chai.request(app)
-//             .post('/api/v1/booking/create')
-//             .set('Authorization', token)
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 trip_id: "CMS",
-//                 created_on: "10/12/2019",
-//                 seat_no: 3
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This trip does not exist");
-//                 done()
-//             })
-//         });
+        it('should book a trip',  (done) => {
+            chai.request(app)
+            .post('/api/v1/bookings')
+            .set('authorization', token)
+            .send({
+                tripId,
+                seat: 3
+            })
+            .then((res) => {
+                const body = res.body;
+                tripId = body.data.id;
+                expect(res.status).to.equal(201);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('data');
+                expect(body.data).to.contain.property('id');
+                expect(body.status).to.equal("success");
+                expect(body.data).to.be.an("object");
+                done()
+            })
+        });
 
-//         it('should check for bus that does not exist', (done) => {
-//             chai.request(app)
-//             .post('/api/v1/booking/create')
-//             .set('Authorization', token)
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 trip_id: "CMS",
-//                 created_on: "10/12/2019",
-//                 seat_no: 3
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This bus does not exist");
-//                 done()
-//             })
-//         });
+        it('should check for trip not available', (done) => {
+            chai.request(app)
+            .post('/api/v1/bookings')
+            .set('authorization', token)
+            .send({
+                tripId: 2,
+                seat: 3
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(400);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("This trip is not available");
+                done()
+            })
+        });
 
-//         it('should check for trip that is canceled', (done) => {
-//             chai.request(app)
-//             .post('/api/v1/trips/create')
-//             .set('Authorization', token)
-//             .send({
-//                 bus_id: "ABC12DE",
-//                 trip_id: "CMS",
-//                 created_on: "10/12/2019",
-//                 seat_no: 3
-//             })
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This trip is canceled");
-//                 done()
-//             })
-//         });
-//     });
+        it('should check for trip that does not exist', (done) => {
+            chai.request(app)
+            .post('/api/v1/bookings')
+            .set('authorization', token)
+            .send({
+                tripId: 5,
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(400);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("Selected trip does not exist");
+                done()
+            })
+        });
+
+        it('should check for taken seat number', (done) => {
+            
+            chai.request(app)
+            .post('/api/v1/bookings')
+            .set('authorization', token)
+            .send({
+                tripId: 3,
+                seat: 3
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(400);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("Seat number is not available");
+                done()
+            })
+        });
+
+        it('should check for trip ID format', (done) => {
+            chai.request(app)
+              .post('/api/v1/bookings')
+              .set('authorization', token)
+              .send({
+                tripId: "qw"
+              })
+              .then((res) => {
+                const { body } = res;
+                expect(res.status).to.equal(400);
+                expect(body).to.contain.property('error');
+                expect(body.error).to.be.a('string');
+                expect(body.error).to.equal('Trip ID is a number');
+                done();
+              });
+          });
+
+          it('should check for seat format', (done) => {
+            chai.request(app)
+              .post('/api/v1/bookings')
+              .set('authorization', token)
+              .send({
+                tripId: 3,
+                seat: "23"
+              })
+              .then((res) => {
+                const { body } = res;
+                expect(res.status).to.equal(400);
+                expect(body).to.contain.property('error');
+                expect(body.error).to.be.a('string');
+                expect(body.error).to.equal('Seat is a number');
+                done();
+              });
+          });
+    });
+})
 
 //     describe('PUT /api/v1/booking/modify/:bookingId', () => {
 //         it('should modify a booking',  (done) => {
