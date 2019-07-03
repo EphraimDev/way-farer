@@ -10,7 +10,6 @@ chai.use(chaiHttp);
 let token = 'bearer ';
 let notAdmin = 'bearer ';
 let tripId;
-let busId;
 
 describe('Trips', () => {
   describe('Get tokens', () => {
@@ -276,17 +275,17 @@ describe('Trips', () => {
   });
 
   describe('DELETE /api/v1/trips/:tripId', () => {
-    it('should cancel a trip',  (done) => {
-        chai.request(app)
+    it('should cancel a trip', (done) => {
+      chai.request(app)
         .delete(`/api/v1/trips/${tripId}`)
         .set('authorization', token)
         .then((res) => {
-            const body = res.body;
-            expect(res.status).to.equal(200);
-            expect(body).to.contain.property('status');
-            expect(body.status).to.equal("success");
-            done()
-        })
+          const { body } = res;
+          expect(res.status).to.equal(200);
+          expect(body).to.contain.property('status');
+          expect(body.status).to.equal('success');
+          done();
+        });
     });
 
     it('should check admin access', (done) => {
@@ -306,19 +305,19 @@ describe('Trips', () => {
     });
 
     it("should fail for trips that don't exists", (done) => {
-        chai.request(app)
-        .delete(`/api/v1/trips/5`)
+      chai.request(app)
+        .delete('/api/v1/trips/5')
         .set('authorization', token)
         .then((res) => {
-            const body = res.body;
-            expect(res.status).to.equal(404);
-            expect(body).to.contain.property('status');
-            expect(body).to.contain.property('error');
-            expect(body.status).to.equal("error");
-            expect(body.error).to.be.a("string");
-            expect(body.error).to.equal("Trip does not exist");
-            done()
-        })
+          const { body } = res;
+          expect(res.status).to.equal(404);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Trip does not exist');
+          done();
+        });
     });
 
     it('should create a trip', (done) => {
@@ -335,31 +334,29 @@ describe('Trips', () => {
         })
         .then((res) => {
           const { body } = res;
-          tripId = body.data.id;
+          tripId = body.data.bus;
           done();
         });
     });
 
     it('should check for trip that cannot be canceled', (done) => {
-      console.log(tripId)
-        chai.request(app)
-        .delete(`/api/v1/trips/2`)
+      chai.request(app)
+        .delete('/api/v1/trips/1')
         .set('authorization', token)
         .then((res) => {
           const { body } = res;
-            expect(res.status).to.equal(400);
-            expect(body).to.contain.property('status');
-            expect(body).to.contain.property('error');
-            expect(body.status).to.equal("error");
-            expect(body.error).to.be.a("string");
-            expect(body.error).to.equal("Trip cannot be cancelled");
-            done()
-        })
+          expect(res.status).to.equal(400);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal('error');
+          expect(body.error).to.be.a('string');
+          expect(body.error).to.equal('Trip cannot be cancelled');
+          done();
+        });
     });
   });
 });
 
-   
 
 //     describe('GET /api/v1/trips/all', () => {
 //         it('should return all trips',  (done) => {

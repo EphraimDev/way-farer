@@ -75,7 +75,6 @@ class TripController {
     }
 
     const findTrip = await pool.query(queryHelper.getTrip, [tripId, 'Active']);
-console.log(findTrip.rows[0])
     if (findTrip.rowCount < 1) {
       return res.status(404).json({
         status: 'error',
@@ -86,9 +85,7 @@ console.log(findTrip.rows[0])
     const todaydate = new Date().getTime();
     const tripDate = new Date(findTrip.rows[0].trip_date).getTime();
 
-    console.log(todaydate, tripDate)
-
-    if (tripDate <= todaydate   || findTrip.rows[0] === 'Ended') {
+    if (tripDate <= todaydate || findTrip.rows[0] === 'Ended') {
       return res.status(400).json({
         status: 'error',
         error: 'Trip cannot be cancelled',
