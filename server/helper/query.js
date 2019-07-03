@@ -8,6 +8,10 @@ const query = {
   getTripById: 'SELECT * FROM trip WHERE id = $1',
   getBusById: 'SELECT * FROM bus WHERE id = $1',
   cancelTrip: 'UPDATE trip SET status = ($1), updated_at = ($2) WHERE id = ($3)',
+  allTrips: 'SELECT * FROM trip',
+  bookTrip: 'INSERT INTO booking(user_id, trip_id, seat_number, created_at) values($1,$2,$3,$4)',
+  getBooking: 'SELECT * FROM booking WHERE trip_id = $1 AND user_id = $2',
+  allTripBooking: 'SELECT * FROM booking WHERE trip_id = $1',
 };
 
 export default query;
