@@ -11,6 +11,7 @@ let token = 'bearer ';
 let notAdmin = 'bearer ';
 let tripId;
 let busId;
+let bookingId;
 
 describe('Bookings', () => {
     describe('Get tokens', () => {
@@ -219,6 +220,7 @@ describe('Bookings', () => {
           .then((res) => {
               const body = res.body;
               tripId = body.data.trip_id;
+              bookingId = body.data.booking_id;
               expect(res.status).to.equal(201);
               expect(body).to.contain.property('status');
               expect(body).to.contain.property('data');
@@ -280,6 +282,91 @@ describe('Bookings', () => {
             done()
         })
     });
+  });
+
+      describe('DELETE /api/v1/bookings/:bookingId', () => {
+        it('should add a bus', (done) => {
+          chai.request(app)
+            .post('/api/v1/bus')
+            .set('authorization', token)
+            .send({
+              numberPlate: 'ABCs1we23DEQ',
+              manufacturer: 'Toyota',
+              model: 'Siena',
+              year: 2008,
+              capacity: 2,
+            })
+            .then((res) => {
+              const { body } = res;
+              busId = body.data.bus_id;
+              done();
+            });
+        });
+        
+      it('should create a trip', (done) => {
+          chai.request(app)
+            .post('/api/v1/trips')
+            .set('authorization', token)
+            .send({
+              busId: busId,
+              origin: 'Ikeja',
+              destination: 'CMS',
+              tripDate: '2030-02-01',
+              tripTime: '4:21:38 AM',
+              fare: 500.00,
+            })
+            .then((res) => {
+              const { body } = res;
+              tripId = body.data.trip_id;
+              done();
+            });
+        });
+
+        it('should book a trip',  (done) => {
+          chai.request(app)
+          .post('/api/v1/bookings')
+          .set('authorization', token)
+          .send({
+              tripId: tripId,
+              seat: 2
+          })
+          .then((res) => {
+              const body = res.body;
+              bookingId = body.data.booking_id;
+              done()
+          })
+      });
+
+        it('should cancel the booking',  (done) => {
+          console.log(bookingId)
+            chai.request(app)
+            .delete(`/api/v1/bookings/${bookingId}`)
+            .set('authorization', token)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(200);
+                expect(body).to.contain.property('status');
+                expect(body.status).to.equal("success");
+                done()
+            })
+        });
+
+        it("should fail for booking that don't exists", (done) => {
+            chai.request(app)
+            .delete('/api/v1/bookings/bookingId')
+            .set('authorization', token)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(404);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("Booking does not belong to user");
+                done()
+            })
+        });
+
     });
 })
 
@@ -378,52 +465,7 @@ describe('Bookings', () => {
 //         });
 //     });
 
-//     describe('DELETE /api/v1/booking/cancel/:bookingId', () => {
-//         it('should cancel the booking',  (done) => {
-//             chai.request(app)
-//             .delete(`/api/v1/booking/cancel/${bookingId}`)
-//             .set('Authorization', token)
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(200);
-//                 expect(body).to.contain.property('status');
-//                 expect(body.status).to.equal("success");
-//                 done()
-//             })
-//         });
 
-//         it("should fail for booking that don't exists", (done) => {
-//             chai.request(app)
-//             .delete('/api/v1/booking/cancel/none')
-//             .set('Authorization', token)
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(404);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This booking does not exist");
-//                 done()
-//             })
-//         });
-
-//         it("should fail for booking that don't belong to the authenticated user", (done) => {
-//             chai.request(app)
-//             .delete(`/api/v1/booking/cancel/${bookingId}`)
-//             .set('Authorization', token)
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(400);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("This booking does not belongs to another user");
-//                 done()
-//             })
-//         });
-//     });
 
 //     describe('GET /api/v1/booking/single/:bookingId', () => {
 //         it('should return the booking data', (done) => {

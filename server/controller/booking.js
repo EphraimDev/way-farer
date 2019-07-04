@@ -150,6 +150,50 @@ class BookingController {
       data:bookings.rows,
     });
   }
+
+  /**
+   * Delete a booking
+   * @staticmethod
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async deleteBooking(req, res) {
+    const {bookingId} = req.params;
+
+      const {user_id} = req.user;
+
+      const bookingDetails = await pool.query(queryHelper.matchBooking, [user_id, bookingId]);
+      
+      if (bookingDetails.rowCount === 0) {
+        return res.status(404).json({
+          error: 'Booking does not belong to user',
+          status: 'error'
+        })
+      }
+
+      const {trip_id} = bookingDetails.rows[0];
+
+      const findTrip = await pool.query(queryHelper.getTripById, [trip_id]);
+      
+      const {trip_date, trip_time} = findTrip.rows[0];
+
+    const tripStart = new Date(trip_date.toLocaleDateString() + ' ' + trip_time);
+
+    if (tripStart <= new Date()) {
+      return res.status(400).json({
+        status: 'error',
+        error: 'This booking cannot be deleted',
+      });
+    }
+      
+      await pool.query(queryHelper.deleteBooking, [bookingId]);
+
+      return res.status(200).json({
+        status: 'success'
+      })
+  }
+
 }
 
 export default BookingController;
