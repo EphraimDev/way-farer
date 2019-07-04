@@ -6,5 +6,6 @@ import authorization from '../middlewares/auth';
 const router = express.Router();
 
 router.post('/', authorization.authorize, validate.book, booking.bookTrip);
+router.get('/', authorization.authorize, booking.getAllBookings);
 
 export default router;

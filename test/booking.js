@@ -8,6 +8,7 @@ chai.should();
 
 chai.use(chaiHttp);
 let token = 'bearer ';
+let notAdmin = 'bearer ';
 let tripId;
 let busId;
 
@@ -24,6 +25,20 @@ describe('Bookings', () => {
               const { body } = res;
               token += body.data.token;
     
+              done();
+            });
+        });
+
+        it('should login a user', (done) => {
+          chai.request(app)
+            .post('/api/v1/auth/login')
+            .send({
+              email: 'non@test.co',
+              password: 'Password1!',
+            })
+            .then((res) => {
+              const { body } = res;
+              notAdmin += body.data.token;
               done();
             });
         });
@@ -233,8 +248,38 @@ describe('Bookings', () => {
                 done()
             })
         });
+    });
 
-        
+      describe('GET /api/v1/bookings', () => {
+        it('should return all bookings',  (done) => {
+            chai.request(app)
+            .get('/api/v1/bookings')
+            .set('authorization', token)
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(200);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('data');
+                expect(body.status).to.equal("success");
+                expect(body.data).to.be.an("array");
+                done()
+            })
+        });
+
+      it('should return error for no bookings',  (done) => {
+        chai.request(app)
+        .get('/api/v1/bookings')
+        .set('authorization', notAdmin)
+        .then((res) => {
+            const body = res.body;
+            expect(res.status).to.equal(404);
+            expect(body).to.contain.property('status');
+            expect(body).to.contain.property('error');
+            expect(body.status).to.equal("error");
+            expect(body.error).to.be.equal("There are no bookings");
+            done()
+        })
+    });
     });
 })
 
@@ -297,22 +342,7 @@ describe('Bookings', () => {
 //         });
 //     });
 
-//     describe('GET /api/v1/admin/bookings', () => {
-//         it('should return all bookings',  (done) => {
-//             chai.request(app)
-//             .get('/api/v1/admin/bookings')
-//             .set('Authorization', token)
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(200);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('data');
-//                 expect(body.status).to.equal("success");
-//                 expect(body.data).to.be.an("object");
-//                 done()
-//             })
-//         });
-//     });
+
 
 //     describe('GET /api/v1/booking/user/:userId', () => {
 //         it('should get the all bookings made by the user',  (done) => {
