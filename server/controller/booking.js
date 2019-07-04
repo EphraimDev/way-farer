@@ -118,6 +118,38 @@ class BookingController {
     //   // console.log(takenSeats);
     // }
   }
+
+   /**
+   * Fetch all bookings
+   * @staticmethod
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async getAllBookings(req, res) {
+
+    const {user_id, is_admin} = req.user;
+
+    let bookings = [];
+
+    if (is_admin === true) {
+      bookings = await pool.query(queryHelper.adminBooking, []);
+    } else{
+      bookings = await pool.query(queryHelper.userBooking, [user_id]);
+    }
+    
+    if (bookings.rowCount <= 0 || bookings.length <= 0) {
+      return res.status(404).json({
+        status: 'error',
+        error: 'There are no bookings',
+      });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data:bookings.rows,
+    });
+  }
 }
 
 export default BookingController;
