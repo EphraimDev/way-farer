@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.post('/', authorization.authorize, validate.book, booking.bookTrip);
 router.get('/', authorization.authorize, booking.getAllBookings);
+router.delete('/:bookingId', authorization.authorize, booking.deleteBooking);
 
 export default router;
