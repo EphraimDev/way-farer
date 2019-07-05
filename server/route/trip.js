@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post('/', authorization.authorize, validate.add, trips.addTrip);
 router.delete('/:tripId', authorization.authorize, trips.cancelTrip);
-router.get('/', authorization.authorize, trips.getAllTrips);
+router.get('/', trips.getAllTrips);
+router.get('/search?', trips.searchTrips);
 
 export default router;

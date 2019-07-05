@@ -16,7 +16,10 @@ const query = {
   adminBooking: 'SELECT * FROM booking',
   userBooking: 'SELECT * FROM booking WHERE user_id = $1',
   matchBooking: 'SELECT * FROM booking WHERE user_id = $1 AND booking_id = $2',
-  deleteBooking: 'DELETE FROM booking WHERE booking_id = $1'
+  deleteBooking: 'DELETE FROM booking WHERE booking_id = $1',
+  searchTrip: 'SELECT * FROM trip WHERE origin = $1 AND destination = $2',
+  searchTripByOrigin: 'SELECT * FROM trip WHERE origin = $1',
+  searchTripByDestination: 'SELECT * FROM trip WHERE destination = $1',
 };
 
 export default query;

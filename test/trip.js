@@ -11,6 +11,8 @@ let token = 'bearer ';
 let notAdmin = 'bearer ';
 let tripId;
 let busId;
+let origin;
+let destination;
 
 describe('Trips', () => {
   describe('Get tokens', () => {
@@ -310,7 +312,6 @@ describe('Trips', () => {
   });
 
   describe('DELETE /api/v1/trips/:tripId', () => {
-    console.log(tripId)
     it('should cancel a trip', (done) => {
       chai.request(app)
         .delete(`/api/v1/trips/${tripId}`)
@@ -407,6 +408,97 @@ describe('Trips', () => {
           done();
         });
     });
+  });
+
+  describe('GET /api/v1/trips/search?', () => {
+    it('should fetch all trips', (done) => {
+      chai.request(app)
+        .get('/api/v1/trips/search')
+        .set('authorization', token)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(200);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('array');
+          done();
+        });
+    });
+
+    it('should search for trips match query origin', (done) => {
+      chai.request(app)
+        .get('/api/v1/trips/search?origin=Ikeja')
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(200);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('array');
+          done();
+        });
+    });
+
+    it('should search for trips match query destination', (done) => {
+      chai.request(app)
+        .get('/api/v1/trips/search?destination=CMS')
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(200);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('array');
+          done();
+        });
+    });
+
+    it('should search for trips match query origin and destination', (done) => {
+      chai.request(app)
+        .get('/api/v1/trips/search?origin=Ikeja&destination=CMS')
+        .set('authorization', token)
+        .then((res) => {
+          const { body } = res;
+          expect(res.status).to.equal(200);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('array');
+          done();
+        });
+    });
+
+    it("should return error if origin does not exist", (done) => {
+      chai.request(app)
+      .get(`/api/v1/trips/search?origin=none`)
+      .then((res) => {
+          const body = res.body;
+          expect(res.status).to.equal(404);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal("error");
+          expect(body.error).to.be.a("string");
+          expect(body.error).to.equal("There are no trips");
+          done()
+      })
+    });
+
+    it("should return error if destination does not exist", (done) => {
+      chai.request(app)
+      .get(`/api/v1/trips/search?destination=none`)
+      .then((res) => {
+          const body = res.body;
+          expect(res.status).to.equal(404);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('error');
+          expect(body.status).to.equal("error");
+          expect(body.error).to.be.a("string");
+          expect(body.error).to.equal("There are no trips");
+          done()
+      })
+    });
+
   });
 });
 
@@ -514,21 +606,7 @@ describe('Trips', () => {
 //             })
 //         });
 
-//         it("should return null if search query does not exist", (done) => {
-//             chai.request(app)
-//             .get(`/api/v1/trips/filter/origin?query=none`)
-//             .then((res) => {
-//                 const body = res.body;
-//                 expect(res.status).to.equal(404);
-//                 expect(body).to.contain.property('status');
-//                 expect(body).to.contain.property('error');
-//                 expect(body.status).to.equal("error");
-//                 expect(body.error).to.be.a("string");
-//                 expect(body.error).to.equal("No trip available");
-//                 done()
-//             })
-//         });
-//     });
+
 
 //     describe('GET /api/v1/trips/filter/destination?query=', () => {
 //         it('should return all the trips matching destination query',  (done) => {
