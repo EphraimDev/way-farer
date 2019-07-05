@@ -126,6 +126,90 @@ class TripController {
       data: trips.rows,
     });
   }
+
+  /**
+   * Search for trips
+   * @staticmethod
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async searchTrips(req, res) {
+    const {origin, destination} = req.query;
+
+    if (!origin && !destination) {
+      TripController.getAllTrips(req, res);
+    }else if (!origin && destination) {
+      TripController.searchTripsByDestination(destination, res)
+    }else if (origin && !destination) {
+       TripController.searchTripsByOrigin(origin, res)
+    }
+    else{
+      const trips = await pool.query(queryHelper.searchTrip, [origin, destination]);
+
+    if (trips.rowCount <= 0) {
+      return res.status(404).json({
+        status: 'error',
+        error: 'There are no trips',
+      });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: trips.rows,
+    });
+    }
+    
+    
+  }
+
+  /**
+   * Search for trips by origin
+   * @staticmethod
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async searchTripsByOrigin(origin, res) {
+    
+    const trips = await pool.query(queryHelper.searchTripByOrigin, [origin]);
+
+    if (trips.rowCount <= 0) {
+      return res.status(404).json({
+        status: 'error',
+        error: 'There are no trips',
+      });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: trips.rows,
+    });
+  }
+
+   /**
+   * Search for trips by origin
+   * @staticmethod
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async searchTripsByDestination(destination, res) {
+    
+    const trips = await pool.query(queryHelper.searchTripByDestination, [destination]);
+
+    if (trips.rowCount <= 0) {
+      return res.status(404).json({
+        status: 'error',
+        error: 'There are no trips',
+      });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: trips.rows,
+    });
+  }
 }
 
 export default TripController;
