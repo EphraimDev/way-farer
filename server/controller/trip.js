@@ -47,7 +47,7 @@ class TripController {
         error: 'A trip with this bus is active',
       });
     }
-    
+
     await pool.query(queryHelper.addTrip,
       [tripId, req.user.user_id, busId, origin, destination, tripDate, tripTime, fare, 'Active', moment.createdAt]);
 
@@ -70,7 +70,7 @@ class TripController {
   static async cancelTrip(req, res) {
     const { tripId } = req.params;
 
-    if (req.user === undefined ||req.user.is_admin !== true) {
+    if (req.user === undefined || req.user.is_admin !== true) {
       return res.status(401).json({
         status: 'error',
         error: 'Admin access only',
@@ -135,17 +135,17 @@ class TripController {
    * @return {json} res.json
    */
   static async searchTrips(req, res) {
-    const {origin, destination} = req.query;
+    const { origin, destination } = req.query;
 
     if (!origin && !destination) {
       TripController.getAllTrips(req, res);
-    }else if (!origin && destination) {
-      TripController.searchTripsByDestination(destination, res)
-    }else if (origin && !destination) {
-       TripController.searchTripsByOrigin(origin, res)
+    } else if (!origin && destination) {
+      TripController.searchTripsByDestination(destination, res);
+    } else if (origin && !destination) {
+      TripController.searchTripsByOrigin(origin, res);
     }
-    else{
-      const trips = await pool.query(queryHelper.searchTrip, [origin, destination]);
+
+    const trips = await pool.query(queryHelper.searchTrip, [origin, destination]);
 
     if (trips.rowCount <= 0) {
       return res.status(404).json({
@@ -158,9 +158,6 @@ class TripController {
       status: 'success',
       data: trips.rows,
     });
-    }
-    
-    
   }
 
   /**
@@ -171,7 +168,6 @@ class TripController {
    * @return {json} res.json
    */
   static async searchTripsByOrigin(origin, res) {
-    
     const trips = await pool.query(queryHelper.searchTripByOrigin, [origin]);
 
     if (trips.rowCount <= 0) {
@@ -187,7 +183,7 @@ class TripController {
     });
   }
 
-   /**
+  /**
    * Search for trips by origin
    * @staticmethod
    * @param  {object} req - Request object
@@ -195,7 +191,6 @@ class TripController {
    * @return {json} res.json
    */
   static async searchTripsByDestination(destination, res) {
-    
     const trips = await pool.query(queryHelper.searchTripByDestination, [destination]);
 
     if (trips.rowCount <= 0) {

@@ -1,3 +1,4 @@
+/* eslint camelcase: 0 */
 import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
@@ -43,7 +44,7 @@ class BookingController {
       });
     }
 
-   const { bus_id } = findTrip.rows[0];
+    const { bus_id } = findTrip.rows[0];
     const bus = await pool.query(queryHelper.getBusById, [bus_id]);
     const { capacity } = bus.rows[0];
     const booked = await pool.query(queryHelper.allTripBooking, [tripId]);
@@ -58,16 +59,18 @@ class BookingController {
     // const available = Math.floor(Math.random() * capacity) + 1;
     // console.log(available);
 
-    if (seat) {
-      booked.rows.forEach(({ seat_number }) => {
-        if (seat_number === seat) {
-          return res.status(400).json({
-            status: 'error',
-            error: 'Seat number is not available',
-          });
-        }
-      });
+
+    if (seat && booked.rowCount > 0) {
+      const checkSeat = booked.rows.find(({ seat_number }) => seat_number === seat);
+
+      if (checkSeat !== undefined) {
+        return res.status(400).json({
+          status: 'error',
+          error: 'Seat number is not available',
+        });
+      }
     }
+
 
     const { user_id } = req.user;
 
@@ -119,7 +122,7 @@ class BookingController {
     // }
   }
 
-   /**
+  /**
    * Fetch all bookings
    * @staticmethod
    * @param  {object} req - Request object
@@ -127,17 +130,16 @@ class BookingController {
    * @return {json} res.json
    */
   static async getAllBookings(req, res) {
-
-    const {user_id, is_admin} = req.user;
+    const { user_id, is_admin } = req.user;
 
     let bookings = [];
 
     if (is_admin === true) {
       bookings = await pool.query(queryHelper.adminBooking, []);
-    } else{
+    } else {
       bookings = await pool.query(queryHelper.userBooking, [user_id]);
     }
-    
+
     if (bookings.rowCount <= 0 || bookings.length <= 0) {
       return res.status(404).json({
         status: 'error',
@@ -147,7 +149,7 @@ class BookingController {
 
     return res.status(200).json({
       status: 'success',
-      data:bookings.rows,
+      data: bookings.rows,
     });
   }
 
@@ -159,26 +161,26 @@ class BookingController {
    * @return {json} res.json
    */
   static async deleteBooking(req, res) {
-    const {bookingId} = req.params;
+    const { bookingId } = req.params;
 
-      const {user_id} = req.user;
+    const { user_id } = req.user;
 
-      const bookingDetails = await pool.query(queryHelper.matchBooking, [user_id, bookingId]);
-      
-      if (bookingDetails.rowCount === 0) {
-        return res.status(404).json({
-          error: 'Booking does not belong to user',
-          status: 'error'
-        })
-      }
+    const bookingDetails = await pool.query(queryHelper.matchBooking, [user_id, bookingId]);
 
-      const {trip_id} = bookingDetails.rows[0];
+    if (bookingDetails.rowCount === 0) {
+      return res.status(404).json({
+        error: 'Booking does not belong to user',
+        status: 'error',
+      });
+    }
 
-      const findTrip = await pool.query(queryHelper.getTripById, [trip_id]);
-      
-      const {trip_date, trip_time} = findTrip.rows[0];
+    const { trip_id } = bookingDetails.rows[0];
 
-    const tripStart = new Date(trip_date.toLocaleDateString() + ' ' + trip_time);
+    const findTrip = await pool.query(queryHelper.getTripById, [trip_id]);
+
+    const { trip_date, trip_time } = findTrip.rows[0];
+
+    const tripStart = new Date(`${trip_date.toLocaleDateString()} ${trip_time}`);
 
     if (tripStart <= new Date()) {
       return res.status(400).json({
@@ -186,14 +188,13 @@ class BookingController {
         error: 'This booking cannot be deleted',
       });
     }
-      
-      await pool.query(queryHelper.deleteBooking, [bookingId]);
 
-      return res.status(200).json({
-        status: 'success'
-      })
+    await pool.query(queryHelper.deleteBooking, [bookingId]);
+
+    return res.status(200).json({
+      status: 'success',
+    });
   }
-
 }
 
 export default BookingController;
