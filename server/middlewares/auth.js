@@ -21,7 +21,7 @@ class Authorization {
    * @returns {string} token
    * expires in 48 hours
    */
-  async generateToken(user) {
+  static async generateToken(user) {
     const token = jwt.sign(
       {
         userId: user.user_id,
@@ -47,14 +47,14 @@ class Authorization {
    * @param {function} next
    * @returns {(function|object)} Function next() or JSON object
    */
-  async authorize(req, res, next) {
+  static async authorize(req, res, next) {
     try {
       const token = await req.headers.authorization.split(' ')[1];
 
       const decoded = await jwt.verify(token, secret);
 
       const foundUser = await pool.query(query.text, [decoded.email]);
-      
+
       [req.user] = foundUser.rows;
       if (req.user === undefined) {
         return res.status(401).json({
@@ -72,5 +72,5 @@ class Authorization {
     }
   }
 }
-const authorization = new Authorization();
-export default authorization;
+
+export default Authorization;

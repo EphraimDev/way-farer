@@ -22,7 +22,7 @@ class AuthController {
       firstname, lastname, email, password, image, isAdmin,
     } = req.body;
 
-const userId = GUID.formGuid();
+    const userId = GUID.formGuid();
 
     const findUser = await pool.query(queryHelper.text, [email]);
 
@@ -37,7 +37,7 @@ const userId = GUID.formGuid();
       const admin = !isAdmin ? false : isAdmin;
       const img = !image ? '' : image;
       const hashedPassword = await bcrypt.hashSync(password, 10);
-      
+
       await pool.query(queryHelper.createUser,
         [userId, email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
 
