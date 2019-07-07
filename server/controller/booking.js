@@ -17,7 +17,7 @@ class BookingController {
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  static async bookTrip(req, res) {
+  static async bookTrip(req, res) { 
     const {
       tripId, seat,
     } = req.body;

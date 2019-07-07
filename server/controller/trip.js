@@ -33,7 +33,7 @@ class TripController {
     const findBus = await pool.query(queryHelper.getBusById, [busId]);
 
     if (findBus.rowCount < 1) {
-      return res.status(409).json({
+      return res.status(404).json({
         status: 'error',
         error: 'Selected bus does not exist',
       });
