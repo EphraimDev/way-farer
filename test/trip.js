@@ -144,7 +144,7 @@ describe('Trips', () => {
         })
         .then((res) => {
           const { body } = res;
-          expect(res.status).to.equal(409);
+          expect(res.status).to.equal(404);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('error');
           expect(body.status).to.equal('error');

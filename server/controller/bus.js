@@ -27,7 +27,7 @@ class BusController {
 
     const busId = guid.formGuid();
 
-    if (req.user === undefined || req.user.is_admin !== true) {
+    if (req.user.is_admin !== true) {
       return res.status(401).json({
         status: 'error',
         error: 'Admin access only',
