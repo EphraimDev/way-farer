@@ -71,6 +71,26 @@ class Authorization {
       });
     }
   }
+
+  /**
+   * Authorize user
+   * @method checkAdmin
+   * @memberof Authorization
+   * @param {object} req
+   * @param {object} res
+   * @param {function} next
+   * @returns {(function|object)} Function next() or JSON object
+   */
+  static async checkAdmin(req, res, next) {
+    if (req.user.is_admin !== true) {
+      return res.status(401).json({
+        status: 'error',
+        error: 'Admin access only',
+      });
+    }
+
+    return next();
+  }
 }
 
 export default Authorization;

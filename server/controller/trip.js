@@ -23,13 +23,6 @@ class TripController {
 
     const tripId = guid.formGuid();
 
-    if (req.user === undefined || req.user.is_admin !== true) {
-      return res.status(401).json({
-        status: 'error',
-        error: 'Admin access only',
-      });
-    }
-
     const findBus = await pool.query(queryHelper.getBusById, [busId]);
 
     if (findBus.rowCount < 1) {
@@ -69,13 +62,6 @@ class TripController {
    */
   static async cancelTrip(req, res) {
     const { tripId } = req.params;
-
-    if (req.user === undefined || req.user.is_admin !== true) {
-      return res.status(401).json({
-        status: 'error',
-        error: 'Admin access only',
-      });
-    }
 
     const findTrip = await pool.query(queryHelper.getTripById, [tripId]);
     if (findTrip.rowCount < 1) {

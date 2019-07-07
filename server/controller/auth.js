@@ -33,13 +33,11 @@ class AuthController {
       });
     }
 
-    try {
       const admin = !isAdmin ? false : isAdmin;
       const img = !image ? '' : image;
       const hashedPassword = await bcrypt.hashSync(password, 10);
 
-      await pool.query(queryHelper.createUser,
-        [userId, email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
+      await pool.query(queryHelper.createUser, [userId, email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
 
       const newUser = await pool.query(queryHelper.text, [email]);
 
@@ -51,20 +49,10 @@ class AuthController {
         status: 'success',
         data: {
           token,
-          firstname: newUser.rows[0].first_name,
-          lastname: newUser.rows[0].last_name,
-          email: newUser.rows[0].email,
-          id: newUser.rows[0].user_id,
-          image: newUser.rows[0].img,
-          isAdmin: newUser.rows[0].is_admin,
+          ...newUser.rows[0]
         },
       });
-    } catch (error) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'Network failure',
-      });
-    }
+   
   }
 
   /**
@@ -95,12 +83,7 @@ class AuthController {
         status: 'success',
         data: {
           token,
-          firstname: findUser.rows[0].first_name,
-          lastname: findUser.rows[0].last_name,
-          email: findUser.rows[0].email,
-          id: findUser.rows[0].user_id,
-          image: findUser.rows[0].img,
-          isAdmin: findUser.rows[0].is_admin,
+          ...findUser.rows[0]
         },
       });
     }
