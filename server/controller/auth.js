@@ -33,26 +33,26 @@ class AuthController {
       });
     }
 
-      const admin = !isAdmin ? false : isAdmin;
-      const img = !image ? '' : image;
-      const hashedPassword = await bcrypt.hashSync(password, 10);
+    const admin = !isAdmin ? false : isAdmin;
+    const img = !image ? '' : image;
+    const hashedPassword = await bcrypt.hashSync(password, 10);
 
-      await pool.query(queryHelper.createUser, [userId, email, firstname, lastname, hashedPassword, img, admin, moment.createdAt]);
+    await pool.query(queryHelper.createUser, [userId, email, firstname,
+      lastname, hashedPassword, img, admin, moment.createdAt]);
 
-      const newUser = await pool.query(queryHelper.text, [email]);
+    const newUser = await pool.query(queryHelper.text, [email]);
 
-      const token = await Authorization.generateToken(newUser.rows[0]);
+    const token = await Authorization.generateToken(newUser.rows[0]);
 
-      Mailer.createAccountMessage(email);
+    Mailer.createAccountMessage(email);
 
-      return res.status(201).json({
-        status: 'success',
-        data: {
-          token,
-          ...newUser.rows[0]
-        },
-      });
-   
+    return res.status(201).json({
+      status: 'success',
+      data: {
+        token,
+        ...newUser.rows[0],
+      },
+    });
   }
 
   /**
@@ -83,7 +83,7 @@ class AuthController {
         status: 'success',
         data: {
           token,
-          ...findUser.rows[0]
+          ...findUser.rows[0],
         },
       });
     }
