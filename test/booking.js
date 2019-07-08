@@ -131,7 +131,7 @@ describe('Bookings', () => {
                 expect(body).to.contain.property('error');
                 expect(body.status).to.equal("error");
                 expect(body.error).to.be.a("string");
-                expect(body.error).to.equal("Selected trip does not exist");
+                expect(body.error).to.equal("This trip does not exist");
                 done()
             })
         });
@@ -185,7 +185,7 @@ describe('Bookings', () => {
                 expect(body).to.contain.property('error');
                 expect(body.status).to.equal("error");
                 expect(body.error).to.be.a("string");
-                expect(body.error).to.equal("This trip is not available");
+                expect(body.error).to.equal("Select another trip");
                 done()
             })
         });

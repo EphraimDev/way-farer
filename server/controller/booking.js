@@ -17,51 +17,40 @@ class BookingController {
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  static async bookTrip(req, res) { 
+  static async bookTrip(req, res) {
     const {
       tripId, seat,
     } = req.body;
 
-    const bookId = guid.formGuid();
+    const findTrip = await BookingController.findTrip(tripId, res);
 
-    const findTrip = await pool.query(queryHelper.getTripById, [tripId]);
-
-    if (findTrip.rowCount < 1) {
+    if (findTrip === false) {
       return res.status(400).json({
         status: 'error',
-        error: 'Selected trip does not exist',
+        error: 'This trip does not exist',
       });
     }
 
-    const { status } = findTrip.rows[0];
-    const todaydate = new Date().getTime();
-    const tripDate = new Date(findTrip.rows[0].trip_date).getTime();
+    const {
+      status, bus_id, todaydate, tripDate,
+    } = await BookingController.tripStatus(findTrip);
 
-    if (status === 'Cancelled' || status === 'Ended' || tripDate <= todaydate) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'This trip is not available',
-      });
-    }
+    const findBus = await BookingController.findBus(bus_id, res);
 
-    const { bus_id } = findTrip.rows[0];
-    const bus = await pool.query(queryHelper.getBusById, [bus_id]);
-    const { capacity } = bus.rows[0];
+    const { capacity } = findBus;
+
+
     const booked = await pool.query(queryHelper.allTripBooking, [tripId]);
 
-    if (capacity <= booked.rowCount) {
+    if (capacity <= booked.rowCount || status === 'Cancelled' || status === 'Ended' || tripDate <= todaydate) {
       return res.status(400).json({
         status: 'error',
-        error: 'Selected trip is completely booked',
+        error: 'Select another trip',
       });
     }
-    // console.log(capacity);
-    // const available = Math.floor(Math.random() * capacity) + 1;
-    // console.log(available);
-
 
     if (seat && booked.rowCount > 0) {
-      const checkSeat = booked.rows.find(({ seat_number }) => seat_number === seat);
+      const checkSeat = await BookingController.checkSeat(booked.rows, seat);
 
       if (checkSeat !== undefined) {
         return res.status(400).json({
@@ -73,53 +62,76 @@ class BookingController {
 
 
     const { user_id } = req.user;
+    const bookId = guid.formGuid();
 
     await pool.query(queryHelper.bookTrip,
       [bookId, user_id, tripId, seat, moment.createdAt]);
 
-    const newBooking = await pool.query(queryHelper.getBooking, [bookId]);
+    const newBooking = await BookingController.getBooking(bookId);
 
     return res.status(201).json({
       status: 'success',
-      data: newBooking.rows[0],
+      data: newBooking,
     });
+  }
 
-    // const seatNumbersInArray = [];
+  /**
+   * Find Seat number
+   * @staticmethod
+   */
+  static async checkSeat(bookings, seat) {
+    const checkSeat = bookings.find(({ seat_number }) => seat_number === seat);
 
-    // for(var i = 1; i <= capacity; i++){
-    //     seatNumbersInArray.push(i);
-    // }
+    return checkSeat;
+  }
 
-    // let remainingSeats = [];
-    // let takenSeats = [];
-    // let availableSeats = "";
+  /**
+   * Find Trip
+   * @staticmethod
+   */
+  static async findTrip(tripId) {
+    const findTrip = await pool.query(queryHelper.getTripById, [tripId]);
 
-    // if (seat) {
-    //   booked.rows.forEach(({ seat_number }) => {
-    //     if (seat_number !== null) {
-    //       takenSeats.push(seat_number);
-    //     }
-    //   });
+    if (findTrip.rowCount < 1) {
+      return false;
+    }
 
-    //   seatNumbersInArray.forEach((num, i) => {
-    //     const findSeat = takenSeats.includes(num);
-    //     if (!findSeat) {
-    //       remainingSeats.push(num);
-    //     }
-    //   })
-    //   const isAvailable = remainingSeats.includes(seat);
+    return findTrip.rows[0];
+  }
 
-    //   if (!isAvailable) {
-    //     remainingSeats.forEach((num) => {
-    //       availableSeats += num + " ";
-    //     })
-    //     return res.status(400).json({
-    //       status: "error",
-    //       error: `Seat number ${seat} is taken. Numbers ${availableSeats}are available `
-    //     })
-    //   }
-    //   // console.log(takenSeats);
-    // }
+  /**
+   * Trip status
+   * @staticmethod
+   */
+  static async tripStatus(findTrip) {
+    const { status, bus_id } = findTrip;
+    const todaydate = new Date().getTime();
+    const tripDate = new Date(findTrip.trip_date).getTime();
+
+    return {
+      status, bus_id, todaydate, tripDate,
+    };
+  }
+
+  /**
+   * Get booking
+   * @staticmethod
+   */
+  static async getBooking(bookId) {
+    const booking = await pool.query(queryHelper.getBooking, [bookId]);
+
+    return booking.rows[0];
+  }
+
+
+  /**
+   * Find Bus
+   * @staticmethod
+   */
+  static async findBus(busId) {
+    const bus = await pool.query(queryHelper.getBusById, [busId]);
+
+    return bus.rows[0];
   }
 
   /**
