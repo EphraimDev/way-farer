@@ -15,13 +15,12 @@ describe('Users Authentication', () => {
         it('should add an admin user',  (done) => {
             chai.request(app)
             .post('/api/v1/auth/signup')
-            .send({
-                email: "test@test.co",
-                firstname: "Way",
-                lastname: "Farer",
-                password: "Password1!",
-                isAdmin: true
-            })
+            .field('email', 'test@test.co')
+            .field('firstname', 'Way')
+            .field('lastname', 'Farer')
+            .field('password', 'Password1!')
+            .field('isAdmin', 'true')
+            .attach('image', './test/files/pic.jpg', 'pic.jpg')
             .then((res) => {
                 const body = res.body;
                 userId = body.data.id;
@@ -68,6 +67,7 @@ describe('Users Authentication', () => {
             })
             .then((res) => {
                 const body = res.body;
+                console.log(body)
                 expect(res.status).to.equal(409);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('error');
@@ -158,43 +158,18 @@ describe('Users Authentication', () => {
             })
         });
 
-        it('should check for wrong admin format',  (done) => {
-            chai.request(app)
-            .post('/api/v1/auth/signup')
-            .send({
-                email: "test@test.co",
-                firstname: "Abe",
-                lastname: "Farer",
-                password: "Password1!",
-                isAdmin: 123
-            })
-            .then((res) => {
-                const body = res.body;
-                expect(res.status).to.equal(400);
-                expect(body).to.contain.property('error');
-                expect(body.error).to.be.a("string");
-                expect(body.error).to.equal("Admin should be a boolean");
-                done()
-            })
-        });
-
         it('should check for wrong image',  (done) => {
             chai.request(app)
             .post('/api/v1/auth/signup')
-            .send({
-                email: "test@test.co",
-                firstname: "Abe",
-                lastname: "Farer",
-                password: "Password1!",
-                isAdmin: true,
-                img: "abc"
-            })
+            .field('email', 'tester@test.co')
+            .field('firstname', 'Way')
+            .field('lastname', 'Farer')
+            .field('password', 'Password1!')
+            .field('isAdmin', 'true')
+            .attach('image', './test/files/non-pic.pdf', 'non-pic.pdf')
             .then((res) => {
                 const body = res.body;
-                expect(res.status).to.equal(400);
-                expect(body).to.contain.property('error');
-                expect(body.error).to.be.a("string");
-                expect(body.error).to.equal("Add a valid image");
+                expect(res.status).to.equal(500);
                 done()
             })
         });

@@ -17,6 +17,11 @@ const config = {
     name: process.env.TEST_DB_NAME,
     host: process.env.TEST_DB_HOST,
   },
+  cloudinary: {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  },
   jwtSecret: process.env.JWT_KEY,
 
   mail: {
