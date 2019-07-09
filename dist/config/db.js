@@ -2,7 +2,7 @@
 
 var cov_1qgaiynwuo = function () {
   var path = "C:\\Users\\FinchglowGroup\\Desktop\\Andela\\way-farer\\server\\config\\db.js";
-  var hash = "08a432482efe1129488f117f3da919940f8e123e";
+  var hash = "581425d6beaadf9e03e27db2e197cea2e77e56ba";
   var global = new Function("return this")();
   var gcv = "__coverage__";
   var coverageData = {
@@ -24,7 +24,7 @@ var cov_1qgaiynwuo = function () {
           column: 15
         },
         end: {
-          line: 41,
+          line: 34,
           column: 1
         }
       }
@@ -38,7 +38,7 @@ var cov_1qgaiynwuo = function () {
     f: {},
     b: {},
     _coverageSchema: "43e27e138ebf9cfc5966b082cf9a028302ed4184",
-    hash: "08a432482efe1129488f117f3da919940f8e123e"
+    hash: "581425d6beaadf9e03e27db2e197cea2e77e56ba"
   };
   var coverage = global[gcv] || (global[gcv] = {});
 
@@ -63,13 +63,6 @@ cov_1qgaiynwuo.s[0]++;
 _dotenv.default.config();
 
 const config = (cov_1qgaiynwuo.s[1]++, {
-  production: {
-    username: process.env.PROD_USERNAME,
-    password: process.env.PROD_PASSWORD,
-    database: process.env.PROD_DATABASE,
-    host: process.env.PROD_HOST,
-    url: process.env.DATABASE_URL
-  },
   development: {
     username: process.env.DEV_USERNAME,
     password: process.env.DEV_PASSWORD,

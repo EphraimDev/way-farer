@@ -3,13 +3,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config = {
-  production: {
-    username: process.env.PROD_USERNAME,
-    password: process.env.PROD_PASSWORD,
-    database: process.env.PROD_DATABASE,
-    host: process.env.PROD_HOST,
-    url: process.env.DATABASE_URL,
-  },
   development: {
     username: process.env.DEV_USERNAME,
     password: process.env.DEV_PASSWORD,

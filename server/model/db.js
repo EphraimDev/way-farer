@@ -12,8 +12,6 @@ const devConfig = {
 
 const prodConfig = process.env.DATABASE_URL;
 
-const dbConfig = (process.env.NODE_ENV === 'production') ? prodConfig : devConfig;
-
 const testConfig = {
   database: config.test.database,
   host: config.test.host,
@@ -22,7 +20,9 @@ const testConfig = {
   port: 5432,
 };
 
-const pool = (process.env.NODE_ENV === 'test') ? new pg.Pool(testConfig) : new pg.Pool(dbConfig);
+const dbConfig = (process.env.NODE_ENV === 'test') ? testConfig : devConfig;
+
+const pool = (process.env.NODE_ENV === 'production') ? new pg.Pool({connectionString: prodConfig}) : new pg.Pool(dbConfig);
 
 
 

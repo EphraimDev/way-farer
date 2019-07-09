@@ -2,7 +2,7 @@
 
 var cov_df4luy0yf = function () {
   var path = "C:\\Users\\FinchglowGroup\\Desktop\\Andela\\way-farer\\server\\model\\db.js";
-  var hash = "b66e8e9498172568457a2844973ff0d0bd71a026";
+  var hash = "153814d29368401a4c625050049ccb54effd191e";
   var global = new Function("return this")();
   var gcv = "__coverage__";
   var coverageData = {
@@ -31,21 +31,21 @@ var cov_df4luy0yf = function () {
       "2": {
         start: {
           line: 15,
-          column: 17
+          column: 19
         },
         end: {
-          line: 15,
-          column: 81
+          line: 21,
+          column: 1
         }
       },
       "3": {
         start: {
-          line: 17,
-          column: 19
+          line: 23,
+          column: 17
         },
         end: {
           line: 23,
-          column: 1
+          column: 75
         }
       },
       "4": {
@@ -55,7 +55,7 @@ var cov_df4luy0yf = function () {
         },
         end: {
           line: 25,
-          column: 96
+          column: 122
         }
       },
       "5": {
@@ -109,35 +109,35 @@ var cov_df4luy0yf = function () {
       "0": {
         loc: {
           start: {
-            line: 15,
+            line: 23,
             column: 17
           },
           end: {
-            line: 15,
-            column: 81
+            line: 23,
+            column: 75
           }
         },
         type: "cond-expr",
         locations: [{
           start: {
-            line: 15,
-            column: 59
+            line: 23,
+            column: 53
           },
           end: {
-            line: 15,
-            column: 69
+            line: 23,
+            column: 63
           }
         }, {
           start: {
-            line: 15,
-            column: 72
+            line: 23,
+            column: 66
           },
           end: {
-            line: 15,
-            column: 81
+            line: 23,
+            column: 75
           }
         }],
-        line: 15
+        line: 23
       },
       "1": {
         loc: {
@@ -147,27 +147,27 @@ var cov_df4luy0yf = function () {
           },
           end: {
             line: 25,
-            column: 96
+            column: 122
           }
         },
         type: "cond-expr",
         locations: [{
           start: {
             line: 25,
-            column: 49
+            column: 55
           },
           end: {
             line: 25,
-            column: 72
+            column: 98
           }
         }, {
           start: {
             line: 25,
-            column: 75
+            column: 101
           },
           end: {
             line: 25,
-            column: 96
+            column: 122
           }
         }],
         line: 25
@@ -190,7 +190,7 @@ var cov_df4luy0yf = function () {
       "1": [0, 0]
     },
     _coverageSchema: "43e27e138ebf9cfc5966b082cf9a028302ed4184",
-    hash: "b66e8e9498172568457a2844973ff0d0bd71a026"
+    hash: "153814d29368401a4c625050049ccb54effd191e"
   };
   var coverage = global[gcv] || (global[gcv] = {});
 
@@ -221,15 +221,17 @@ const devConfig = (cov_df4luy0yf.s[0]++, {
   port: 5432
 });
 const prodConfig = (cov_df4luy0yf.s[1]++, process.env.DATABASE_URL);
-const dbConfig = (cov_df4luy0yf.s[2]++, process.env.NODE_ENV === 'production' ? (cov_df4luy0yf.b[0][0]++, prodConfig) : (cov_df4luy0yf.b[0][1]++, devConfig));
-const testConfig = (cov_df4luy0yf.s[3]++, {
+const testConfig = (cov_df4luy0yf.s[2]++, {
   database: _db.default.test.database,
   host: _db.default.test.host,
   user: _db.default.test.username,
   password: _db.default.test.password,
   port: 5432
 });
-const pool = (cov_df4luy0yf.s[4]++, process.env.NODE_ENV === 'test' ? (cov_df4luy0yf.b[1][0]++, new _pg.default.Pool(testConfig)) : (cov_df4luy0yf.b[1][1]++, new _pg.default.Pool(dbConfig)));
+const dbConfig = (cov_df4luy0yf.s[3]++, process.env.NODE_ENV === 'test' ? (cov_df4luy0yf.b[0][0]++, testConfig) : (cov_df4luy0yf.b[0][1]++, devConfig));
+const pool = (cov_df4luy0yf.s[4]++, process.env.NODE_ENV === 'production' ? (cov_df4luy0yf.b[1][0]++, new _pg.default.Pool({
+  connectionString: prodConfig
+})) : (cov_df4luy0yf.b[1][1]++, new _pg.default.Pool(dbConfig)));
 cov_df4luy0yf.s[5]++;
 pool.on('connect', () => {
   cov_df4luy0yf.f[0]++;
