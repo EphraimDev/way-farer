@@ -4,8 +4,8 @@
   "description": "public bus transportation booking server",
   "main": "app.js",
   "scripts": {
-    "start": "babel-node app.js",
-    "start:dev": "nodemon --exec babel-node app.js",
+    "start": "node ./dist/app.js",
+    "start:dev": "nodemon --exec babel-node ./server/app.js",
     "create": "babel-node ./server/model/db.js createTables",
     "db:create": "psql -U way-farer -d way_farer -f server/model/tables.sql",
     "db:drop": "psql -U way-farer -d way_farer -f server/model/drop.sql",
@@ -17,7 +17,13 @@
     "eslint": "./node_modules/.bin/eslint --fix ./server/**/*.js",
     "test": "cross-env NODE_ENV=test nyc mocha --require @babel/register --timeout 6000 test/index.js --exit",
     "test:dev": "npm run test:db && npm test && npm run coverage",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "clean": "rimraf dist",
+    "build": "babel ./server --out-dir dist",
+    "prod": "cross-env NODE_ENV=production npm-run-all clean build start:prod",
+    "start:prod": "npm-run-all prod:create start:prod",
+    "prod:drop": "node dist/migrations/dropTable",
+    "prod:create": "node dist/migrations/createTable"
   },
   "repository": {
     "type": "git",
@@ -31,6 +37,9 @@
   "homepage": "https://github.com/EphraimDev/way-farer#readme",
   "devDependencies": {
     "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "@istanbuljs/nyc-config-babel": "^2.1.1",
     "babel-plugin-istanbul": "^5.1.4",
     "chai": "^4.2.0",
@@ -45,9 +54,6 @@
     "nyc": "^14.1.1"
   },
   "dependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/node": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
@@ -57,8 +63,10 @@
     "moment": "^2.24.0",
     "morgan": "^1.9.1",
     "nodemailer": "^6.2.1",
+    "npm-run-all": "^4.1.5",
     "pg": "^7.11.0",
     "random-string": "^0.2.0",
+    "rimraf": "^2.6.3",
     "swagger-jsdoc": "^3.2.9",
     "swagger-ui-express": "^4.0.7"
   }

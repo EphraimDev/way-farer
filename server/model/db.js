@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import pg from 'pg';
 import config from '../config/db';
 
@@ -10,13 +11,7 @@ const devConfig = {
   port: 5432,
 };
 
-// const prodConfig = {
-//   database: config.production.database,
-//   host: config.production.host,
-//   user: config.production.username,
-//   password: config.production.password,
-//   port: 5432,
-// };
+const prodConfig = process.env.DATABASE_URL;
 
 const testConfig = {
   database: config.test.database,
@@ -26,7 +21,9 @@ const testConfig = {
   port: 5432,
 };
 
-const pool = (process.env.NODE_ENV === 'test') ? new pg.Pool(testConfig) : new pg.Pool(devConfig);
+const dbConfig = (process.env.NODE_ENV === 'test') ? testConfig : devConfig;
+
+const pool = (process.env.NODE_ENV === 'production') ? new pg.Pool({ connectionString: prodConfig }) : new pg.Pool(dbConfig);
 
 
 pool.on('connect', () => {
