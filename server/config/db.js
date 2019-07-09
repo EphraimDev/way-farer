@@ -8,14 +8,14 @@ const config = {
     password: process.env.PROD_PASSWORD,
     database: process.env.PROD_DATABASE,
     host: process.env.PROD_HOST,
-    url: process.env.PROD_DATABASE_URL,
+    url: process.env.DATABASE_URL,
   },
   development: {
     username: process.env.DEV_USERNAME,
     password: process.env.DEV_PASSWORD,
     database: process.env.DEV_DATABASE,
     host: process.env.DEV_HOST,
-    url: process.env.DEV_DATABASE_URL,
+    url: process.env.DATABASE_URL,
   },
   test: {
     username: process.env.TEST_DB_USER,

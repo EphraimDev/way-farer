@@ -30,7 +30,9 @@
   },
   "homepage": "https://github.com/EphraimDev/way-farer#readme",
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "@istanbuljs/nyc-config-babel": "^2.1.1",
     "babel-plugin-istanbul": "^5.1.4",
     "chai": "^4.2.0",
@@ -45,9 +47,7 @@
     "nyc": "^14.1.1"
   },
   "dependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/node": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
+    "@babel/cli": "^7.4.4",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",
