@@ -4,7 +4,7 @@
   "description": "public bus transportation booking server",
   "main": "app.js",
   "scripts": {
-    "start:prod": "node ./dist/app.js",
+    "start": "node ./dist/app.js",
     "start:dev": "nodemon --exec babel-node ./server/app.js",
     "create": "babel-node ./server/model/db.js createTables",
     "db:create": "psql -U way-farer -d way_farer -f server/model/tables.sql",
@@ -21,7 +21,7 @@
     "clean": "rimraf dist",
     "build": "babel ./server --out-dir dist",
     "prod": "cross-env NODE_ENV=production npm-run-all clean build start:prod",
-    "start": "npm-run-all prod:create start:prod",
+    "start:prod": "npm-run-all prod:create start:prod",
     "prod:drop": "node dist/migrations/dropTable",
     "prod:create": "node dist/migrations/createTable"
   },

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import pg from 'pg';
 import config from '../config/db';
 
@@ -22,8 +23,7 @@ const testConfig = {
 
 const dbConfig = (process.env.NODE_ENV === 'test') ? testConfig : devConfig;
 
-const pool = (process.env.NODE_ENV === 'production') ? new pg.Pool({connectionString: prodConfig}) : new pg.Pool(dbConfig);
-
+const pool = (process.env.NODE_ENV === 'production') ? new pg.Pool({ connectionString: prodConfig }) : new pg.Pool(dbConfig);
 
 
 pool.on('connect', () => {

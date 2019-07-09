@@ -2,10 +2,10 @@
 import pool from '../model/db';
 
 pool.on('connect', () => {
-    console.log('Connected to the database');
-  });
+  console.log('Connected to the database');
+});
 
-  const queryText = `CREATE TYPE action AS ENUM
+const queryText = `CREATE TYPE action AS ENUM
   ('Active', 'Cancelled', 'Ended');
   
   CREATE TABLE users
@@ -71,15 +71,15 @@ pool.on('connect', () => {
       created_at TIMESTAMP,
       updated_at TIMESTAMP,
       PRIMARY KEY(id, booking_id)
-  );`
+  );`;
 
-  pool
+pool
   .query(queryText)
-  .then(res => {
+  .then((res) => {
     console.log(res);
     pool.end();
   })
-  .catch(err => {
+  .catch((err) => {
     console.log(err);
     pool.end();
   });
