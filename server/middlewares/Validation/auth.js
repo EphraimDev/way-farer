@@ -15,7 +15,6 @@ class AuthValidation {
   static validateSignUp(req, res, next) {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}/;
     const regex = /^[a-zA-Z- ]+( [a-zA-Z- ]+)*$/i;
-    const imgRegex = /^https?:\/\/(?:[a-z-]+\.)+[a-z]{2,6}(?:\/[^#?]+)+\.(?:jpe?g|gif|png)$/;
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
     const {
@@ -23,9 +22,8 @@ class AuthValidation {
       lastname,
       email,
       password,
-      isAdmin,
-      img,
     } = req.body;
+
     if (typeof firstname !== 'string' || firstname.length < 1 || regex.test(firstname) === false) {
       return res.status(400).json({ error: 'First name should only contain letters' });
     }
@@ -38,17 +36,8 @@ class AuthValidation {
     if (typeof password !== 'string' || password.toString().trim() === '' || passwordRegex.test(password) === false) {
       return res.status(400).send({ error: 'Password must contain minimum of eight characters, at least one uppercase letter, one lowercase letter, one number and one special character' });
     }
-    if (img && (!imgRegex.test(img) || img.toString().trim() === '')) {
-      return res.status(400).send({ error: 'Add a valid image' });
-    }
-    if (isAdmin && (isAdmin === true)) {
-      return next();
-    } if (isAdmin && (isAdmin === false)) {
-      return next();
-    } if (!isAdmin && !img) {
-      return next();
-    }
-    return res.status(400).send({ error: 'Admin should be a boolean' });
+    
+    return next();
   }
 
   /**

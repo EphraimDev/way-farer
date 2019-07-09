@@ -5,6 +5,7 @@ import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 import Mailer from '../utils/mailer';
 import GUID from '../utils/guid';
+import upload from '../utils/cloudinary';
 
 /**
  * @exports
@@ -17,11 +18,17 @@ class AuthController {
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  static async signup(req, res) {
+  static async signup(req, res, next) {
     const {
-      firstname, lastname, email, password, image, isAdmin,
+      firstname, lastname, email, password, isAdmin,
     } = req.body;
 
+    if (req.file) {
+      await upload(req);
+    }
+
+    
+    
     const userId = GUID.formGuid();
 
     const findUser = await pool.query(queryHelper.text, [email]);
@@ -33,8 +40,8 @@ class AuthController {
       });
     }
 
-    const admin = !isAdmin ? false : isAdmin;
-    const img = !image ? '' : image;
+    const admin = isAdmin !== 'true' ? false : true;
+    const img = !req.body.imageURL ? '' : req.body.imageURL;
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
     await pool.query(queryHelper.createUser, [userId, email, firstname,
