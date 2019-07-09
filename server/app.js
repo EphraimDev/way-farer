@@ -4,7 +4,7 @@ import morganLogger from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import router from './server/route';
+import router from './route';
 
 const app = express();
 
