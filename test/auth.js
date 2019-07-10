@@ -113,7 +113,7 @@ describe('Users Authentication', () => {
                 expect(res.status).to.equal(400);
                 expect(body).to.contain.property('error');
                 expect(body.error).to.be.a("string");
-                expect(body.error).to.equal("First name should only contain letters");
+                expect(body.error).to.equal("First name is required");
                 done()
             })
         });
@@ -133,7 +133,7 @@ describe('Users Authentication', () => {
                 expect(res.status).to.equal(400);
                 expect(body).to.contain.property('error');
                 expect(body.error).to.be.a("string");
-                expect(body.error).to.equal("Last name should only contain letters");
+                expect(body.error).to.equal("Last name is required");
                 done()
             })
         });
