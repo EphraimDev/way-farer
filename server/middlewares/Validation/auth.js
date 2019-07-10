@@ -36,7 +36,7 @@ class AuthValidation {
     if (typeof password !== 'string' || password.toString().trim() === '' || passwordRegex.test(password) === false) {
       return res.status(400).send({ error: 'Password must contain minimum of eight characters, at least one uppercase letter, one lowercase letter, one number and one special character' });
     }
-    
+
     return next();
   }
 

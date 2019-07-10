@@ -7,8 +7,9 @@ import app from '../server/app';
 chai.should();
 
 chai.use(chaiHttp);
-let token = "";
+let token = "bearer ";
 let userId = "";
+let anotherId = "";
 
 describe('Users Authentication', () => {
     describe('POST /api/v1/auth/signup', () => {
@@ -23,7 +24,6 @@ describe('Users Authentication', () => {
             .attach('image', './test/files/pic.jpg', 'pic.jpg')
             .then((res) => {
                 const body = res.body;
-                userId = body.data.id;
                 expect(res.status).to.equal(201);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
@@ -45,6 +45,7 @@ describe('Users Authentication', () => {
               })
               .then((res) => {
                 const { body } = res;
+                anotherId = body.data.user_id;
                 expect(res.status).to.equal(201);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
@@ -67,7 +68,6 @@ describe('Users Authentication', () => {
             })
             .then((res) => {
                 const body = res.body;
-                console.log(body)
                 expect(res.status).to.equal(409);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('error');
@@ -185,7 +185,8 @@ describe('Users Authentication', () => {
             })
             .then((res) => {
                 const body = res.body;
-                userId = body.data.id;
+                userId = body.data.user_id;
+                token += body.data.token;
                 expect(res.status).to.equal(200);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
@@ -235,74 +236,66 @@ describe('Users Authentication', () => {
         });
     });
 
-    // describe(`PUT /api/v1/auth/update/:userId`, () => {
-    //     it('should modify a user profile',  (done) => {
-    //         chai.request(app)
-    //         .put(`/api/v1/auth/update/${userId}`)
-    //         .set('Authorization', token)
-    //         .send({
-    //             email: "test@test.co",
-    //             first_name: "Way",
-    //             last_name: "Fare",
-    //             password: "Password1!",
-    //             is_admin: false
-    //         })
-    //         .then((res) => {
-    //             const body = res.body;
-    //             expect(res.status).to.equal(201);
-    //             expect(body).to.contain.property('status');
-    //             expect(body).to.contain.property('data');
-    //             expect(body.status).to.equal("success");
-    //             expect(body.data).to.be.an("object");
-    //             done()
-    //         })
-    //     });
+    describe(`PATCH /api/v1/auth/:userId`, () => {
+        it('should update a user profile',  (done) => {
+            chai.request(app)
+            .patch(`/api/v1/auth/${userId}`)
+            .set('authorization', token)
+            .send({
+                firstname: "Way",
+                lastname: "Fare"
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(200);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('data');
+                expect(body.status).to.equal("success");
+                expect(body.data).to.be.an("object");
+                done()
+            })
+        });
 
-    //     it('should check if user exists',  (done) => {
-    //         chai.request(app)
-    //         .put(`/api/v1/auth/update/userId`)
-    //         .set('Authorization', token)
-    //         .send({
-    //             email: "test@test.co",
-    //             first_name: "Way",
-    //             last_name: "Farer",
-    //             password: "Password1!",
-    //             is_admin: true
-    //         })
-    //         .then((res) => {
-    //             const body = res.body;
-    //             expect(res.status).to.equal(404);
-    //             expect(body).to.contain.property('status');
-    //             expect(body).to.contain.property('error');
-    //             expect(body.status).to.equal("error");
-    //             expect(body.error).to.be.a("string");
-    //             expect(body.error).to.equal("User does not exist");
-    //             done()
-    //         })
-    //     });
+        it('should check if user is authorized',  (done) => {
+            chai.request(app)
+            .patch(`/api/v1/auth/${anotherId}`)
+            .set('authorization', token)
+            .send({
+                firstname: "Way",
+                lastname: "Fare"
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(401);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("User not authorized");
+                done()
+            })
+        });
 
-    //     it('should check for wrong input formats',  (done) => {
-    //         chai.request(app)
-    //         .put(`/api/v1/auth/update/${userId}`)
-    //         .set('Authorization', token)
-    //         .send({
-    //             email: "test",
-    //             first_name: "Way",
-    //             last_name: "Farer",
-    //             password: "Pass"
-    //         })
-    //         .then((res) => {
-    //             const body = res.body;
-    //             expect(res.status).to.equal(400);
-    //             expect(body).to.contain.property('status');
-    //             expect(body).to.contain.property('error');
-    //             expect(body.status).to.equal("error");
-    //             expect(body.error).to.be.a("string");
-    //             expect(body.error).to.equal("Wrong email or password format");
-    //             done()
-    //         })
-    //     });
-    // });
+        it('should check if user exists',  (done) => {
+            chai.request(app)
+            .patch(`/api/v1/auth/abcd`)
+            .set('authorization', token)
+            .send({
+                firstname: "Way",
+                lastname: "Fare"
+            })
+            .then((res) => {
+                const body = res.body;
+                expect(res.status).to.equal(404);
+                expect(body).to.contain.property('status');
+                expect(body).to.contain.property('error');
+                expect(body.status).to.equal("error");
+                expect(body.error).to.be.a("string");
+                expect(body.error).to.equal("User does not exist");
+                done()
+            })
+        });
+    });
 
     // describe('GET /api/v1/auth/profile/:userId', () => {
     //     it('should return profile of the selected user',  (done) => {
