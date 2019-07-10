@@ -2,6 +2,7 @@ import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 import guid from '../utils/guid';
+import upload from '../utils/cloudinary';
 
 /**
  * @exports
@@ -43,13 +44,15 @@ class BusController {
       });
     }
 
-    const img = !image ? '' : image;
+    if (req.file) {
+      await upload(req);
+    }
 
-    await pool.query(queryHelper.addBus,
+    const img = !req.body.imageURL ? '' : req.body.imageURL;;
+
+    const newBus = await pool.query(queryHelper.addBus,
       [busId, req.user.user_id, numberPlate, manufacturer,
         model, year, capacity, color, img, moment.createdAt]);
-
-    const newBus = await pool.query(queryHelper.getBus, [numberPlate]);
 
     return res.status(201).json({
       status: 'success',

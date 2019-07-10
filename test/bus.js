@@ -48,19 +48,17 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 2008,
-          capacity: 5,
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
+        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(201);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('data');
-          expect(body.data).to.contain.property('id');
           expect(body.status).to.equal('success');
           expect(body.data).to.be.an('object');
           done();
@@ -71,13 +69,11 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('Authorization', token)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 2008,
-          capacity: 5,
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(409);
@@ -94,13 +90,11 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', notToken)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 2008,
-          capacity: 5,
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(401);
@@ -117,13 +111,11 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', notAdmin)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 2008,
-          capacity: 5,
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(401);
@@ -140,18 +132,17 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: 1,
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: '2008',
-        })
+        .field('numberPlate', '')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(400);
           expect(body).to.contain.property('error');
           expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Number plate accepts only letters and numbers');
+          expect(body.error).to.equal('Number plate is missing');
           done();
         });
     });
@@ -160,18 +151,18 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: '1',
-          manufacturer: 1,
-          model: 'Siena',
-          year: '2008',
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', '')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
+        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(400);
           expect(body).to.contain.property('error');
           expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Manufacturer accepts only letters');
+          expect(body.error).to.equal('Manufacturer is missing');
           done();
         });
     });
@@ -180,18 +171,18 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: '1',
-          manufacturer: 'Toyota',
-          model: 1,
-          year: '2008',
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', '')
+        .field('year', '1234')
+        .field('capacity', '5')
+        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(400);
           expect(body).to.contain.property('error');
           expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Model accepts only letters');
+          expect(body.error).to.equal('Model of bus is missing');
           done();
         });
     });
@@ -200,57 +191,28 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 2008,
-          capacity: 5,
-          image: 'abc',
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
+        .attach('image', './test/files/non-pic.pdf', 'non-pic.pdf')
         .then((res) => {
-          const { body } = res;
-          expect(res.status).to.equal(400);
-          expect(body).to.contain.property('error');
-          expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Add a valid image');
+          expect(res.status).to.equal(500);
           done();
         });
     });
-
-    it('should check for wrong color format', (done) => {
+    
+    it('should check for wrong year', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 2008,
-          capacity: 5,
-          color: true,
-        })
-        .then((res) => {
-          const { body } = res;
-          expect(res.status).to.equal(400);
-          expect(body).to.contain.property('error');
-          expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Color accepts only letters');
-          done();
-        });
-    });
-
-    it('should check for wrong year data type', (done) => {
-      chai.request(app)
-        .post('/api/v1/bus')
-        .set('authorization', token)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: '2008',
-          capacity: 5,
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', 'ed')
+        .field('capacity', '5')
+        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(400);
@@ -265,13 +227,12 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 12,
-          capacity: 5,
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '123')
+        .field('capacity', '5')
+        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(400);
@@ -286,13 +247,12 @@ describe('Buses', () => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
-        .send({
-          numberPlate: 'ABC123DE',
-          manufacturer: 'Toyota',
-          model: 'Siena',
-          year: 1234,
-          capacity: 'w',
-        })
+        .field('numberPlate', 'test@test.co')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', 'w')
+        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(400);

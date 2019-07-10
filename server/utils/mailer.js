@@ -35,11 +35,13 @@ class Mailer {
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        return console.log(error);
+        return 'failed';
       }
-      return console.log(info.messageId);
+      console.log(info.messageId)
     });
-  }
+
+    return 'success'
+  }  
 
   /**
    * Sends Mail after user succesfully creates an account

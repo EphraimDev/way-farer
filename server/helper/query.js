@@ -3,7 +3,7 @@ const query = {
   updateUser: 'UPDATE users SET first_name=$1,last_name=$2,password=$3,img=$4,is_admin=$5,updated_at=$6 WHERE user_id = $7 RETURNING user_id, first_name, last_name, email, img, is_admin',
   text: 'SELECT * FROM users WHERE email = $1',
   userId: 'SELECT * FROM users WHERE user_id = $1',
-  addBus: 'INSERT INTO bus(bus_id, user_id, number_plate, manufacturer, model, year, capacity, color, img, created_at) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
+  addBus: 'INSERT INTO bus(bus_id, user_id, number_plate, manufacturer, model, year, capacity, color, img, created_at) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING bus_id, number_plate, manufacturer, model, year, capacity, color, img',
   getBus: 'SELECT * FROM bus WHERE number_plate = $1',
   addTrip: 'INSERT INTO trip(trip_id, user_id, bus_id, origin, destination, trip_date, trip_time, fare, status, created_at) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
   getTrip: 'SELECT * FROM trip WHERE trip_id = $1',
