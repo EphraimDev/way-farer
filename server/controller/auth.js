@@ -18,7 +18,7 @@ class AuthController {
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  static async signup(req, res, next) {
+  static async signup(req, res) {
     const {
       firstname, lastname, email, password, isAdmin,
     } = req.body;
@@ -27,8 +27,7 @@ class AuthController {
       await upload(req);
     }
 
-    
-    
+
     const userId = GUID.formGuid();
 
     const findUser = await pool.query(queryHelper.text, [email]);
@@ -40,14 +39,14 @@ class AuthController {
       });
     }
 
-    const admin = isAdmin !== 'true' ? false : true;
+    const admin = isAdmin === 'true';
     const img = !req.body.imageURL ? '' : req.body.imageURL;
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
-    await pool.query(queryHelper.createUser, [userId, email, firstname,
+    const newUser = await pool.query(queryHelper.createUser, [userId, email, firstname,
       lastname, hashedPassword, img, admin, moment.createdAt]);
 
-    const newUser = await pool.query(queryHelper.text, [email]);
+    // const newUser = await pool.query(queryHelper.text, [email]);
 
     const token = await Authorization.generateToken(newUser.rows[0]);
 
@@ -109,6 +108,56 @@ class AuthController {
    */
   static verifyPassword(password, hash) {
     return bcrypt.compare(password, hash);
+  }
+
+  /**
+   * Update user profile
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async updateProfile(req, res) {
+    const {
+      firstname, lastname, isAdmin, password,
+    } = req.body;
+
+    const { userId } = req.params;
+
+    const findUser = await pool.query(queryHelper.userId, [userId]);
+
+    if (findUser.rowCount < 1) {
+      return res.status(404).json({
+        status: 'error',
+        error: 'User does not exist',
+      });
+    }
+
+    if (userId !== req.user.user_id) {
+      return res.status(401).json({
+        status: 'error',
+        error: 'User not authorized',
+      });
+    }
+
+    const firstName = firstname !== undefined ? firstname : findUser.rows[0].first_name;
+    const lastName = lastname !== undefined ? lastname : findUser.rows[0].last_name;
+    const admin = isAdmin !== undefined ? isAdmin : findUser.rows[0].is_admin;
+    const pass = password !== undefined ? await bcrypt.hashSync(password, 10)
+      : findUser.rows[0].password;
+
+    let image = findUser.rows[0].img;
+    if (req.file) {
+      await upload(req);
+      image = req.body.imageURL;
+    }
+
+    const updatedUser = await pool.query(queryHelper.updateUser,
+      [firstName, lastName, pass, image, admin, moment.updatedAt, userId]);
+
+    return res.status(200).json({
+      status: 'success',
+      data: updatedUser.rows[0],
+    });
   }
 }
 

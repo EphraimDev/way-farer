@@ -417,6 +417,7 @@ describe('Trips', () => {
         .set('authorization', token)
         .then((res) => {
           const { body } = res;
+          console.log(body.data)
           expect(res.status).to.equal(200);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('data');

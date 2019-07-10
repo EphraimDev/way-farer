@@ -1,11 +1,11 @@
+import Regex from "../../helper/regex";
+
 /**
  * @exports
  * @class BusValidation
  */
 class BusValidation {
   /**
-          * Validate add bus input
-          *
           * @staticmethod
           * @param  {object} req - Request object
           * @param {object} res - Response object
@@ -13,26 +13,23 @@ class BusValidation {
           * @return {json} res.json
           */
   static add(req, res, next) {
-    const regex = /^[a-z0-9]+$/i;
-    const imgRegex = /^https?:\/\/(?:[a-z-]+\.)+[a-z]{2,6}(?:\/[^#?]+)+\.(?:jpe?g|gif|png)$/;
-
     const {
       numberPlate,
       manufacturer, model, year, capacity, color, image,
     } = req.body;
-    if (typeof numberPlate !== 'string' || regex.test(numberPlate) === false || numberPlate.toString().trim() === '') {
+    if (typeof numberPlate !== 'string' || Regex.regex.test(numberPlate) === false || numberPlate.toString().trim() === '') {
       return res.status(400).json({ error: 'Number plate accepts only letters and numbers' });
     }
-    if (typeof manufacturer !== 'string' || regex.test(manufacturer) === false || manufacturer.toString().trim() === '') {
+    if (typeof manufacturer !== 'string' || Regex.regex.test(manufacturer) === false || manufacturer.toString().trim() === '') {
       return res.status(400).send({ error: 'Manufacturer accepts only letters' });
     }
-    if (typeof model !== 'string' || regex.test(model) === false || model.toString().trim() === '') {
+    if (typeof model !== 'string' || Regex.regex.test(model) === false || model.toString().trim() === '') {
       return res.status(400).send({ error: 'Model accepts only letters' });
     }
-    if (image && (!imgRegex.test(image) || image.toString().trim() === '')) {
+    if (image && (!Regex.imgRegex.test(image) || image.toString().trim() === '')) {
       return res.status(400).send({ error: 'Add a valid image' });
     }
-    if (color && (typeof color !== 'string' || regex.test(color) === false || color.toString().trim() === '')) {
+    if (color && (typeof color !== 'string' || Regex.regex.test(color) === false || color.toString().trim() === '')) {
       return res.status(400).send({ error: 'Color accepts only letters' });
     }
     if (typeof year !== 'number') {
