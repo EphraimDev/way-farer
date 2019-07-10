@@ -123,27 +123,13 @@ class TripController {
   static async searchTrips(req, res) {
     const { origin, destination } = req.query;
 
-    if (!origin && !destination) {
-      TripController.getAllTrips(req, res);
-    } else if (!origin && destination) {
-      TripController.searchTripsByDestination(destination, res);
+    if (!origin && destination) {
+      return TripController.searchTripsByDestination(destination, res);
     } else if (origin && !destination) {
-      TripController.searchTripsByOrigin(origin, res);
+      return TripController.searchTripsByOrigin(origin, res);
     }
 
-    const trips = await pool.query(queryHelper.searchTrip, [origin, destination]);
-
-    if (trips.rowCount <= 0) {
-      return res.status(404).json({
-        status: 'error',
-        error: 'There are no trips',
-      });
-    }
-
-    return res.status(200).json({
-      status: 'success',
-      data: trips.rows,
-    });
+    return TripController.getAllTrips(req, res);
   }
 
   /**
