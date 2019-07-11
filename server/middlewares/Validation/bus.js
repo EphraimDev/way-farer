@@ -1,5 +1,3 @@
-import Regex from "../../helper/regex";
-
 /**
  * @exports
  * @class BusValidation
@@ -12,36 +10,46 @@ class BusValidation {
           * @param {function} next - middleware next (for error handling)
           * @return {json} res.json
           */
-  static add(req, res, next) {
-    const {
-      numberPlate,
-      manufacturer, model, year, capacity, color, image,
-    } = req.body;
-    if (typeof numberPlate !== 'string' || Regex.regex.test(numberPlate) === false || numberPlate.toString().trim() === '') {
-      return res.status(400).json({ error: 'Number plate accepts only letters and numbers' });
+  static company(req, res, next) {
+    const { manufacturer, model, year} = req.body;
+
+    if (manufacturer.toString().trim() === '') {
+      return res.status(400).send({ error: 'Manufacturer is missing' });
     }
-    if (typeof manufacturer !== 'string' || Regex.regex.test(manufacturer) === false || manufacturer.toString().trim() === '') {
-      return res.status(400).send({ error: 'Manufacturer accepts only letters' });
+    if (model.toString().trim() === '') {
+      return res.status(400).send({ error: 'Model of bus is missing' });
     }
-    if (typeof model !== 'string' || Regex.regex.test(model) === false || model.toString().trim() === '') {
-      return res.status(400).send({ error: 'Model accepts only letters' });
-    }
-    if (image && (!Regex.imgRegex.test(image) || image.toString().trim() === '')) {
-      return res.status(400).send({ error: 'Add a valid image' });
-    }
-    if (color && (typeof color !== 'string' || Regex.regex.test(color) === false || color.toString().trim() === '')) {
-      return res.status(400).send({ error: 'Color accepts only letters' });
-    }
-    if (typeof year !== 'number') {
+    if (Number(year).toString() === "NaN") {
       return res.status(400).send({ error: 'Year must be a number' });
     }
     if (year.toString().length !== 4) {
       return res.status(400).send({ error: 'Year must take the format yyyy' });
     }
-    if (typeof capacity !== 'number') {
+    return next();
+  }
+
+  static physicalProps(req,res,next){
+    const {numberPlate, capacity} = req.body;
+
+    
+    if (numberPlate.toString().trim() === '') {
+      return res.status(400).json({ error: 'Number plate is missing' });
+    }
+    if (Number(capacity) > 0 === false) {
       return res.status(400).send({ error: 'Enter a valid bus capacity greater than 0' });
     }
+    return next();
+  }
 
+  static year(req, res, next) {
+    const { year} = req.body;
+
+    if (Number(year).toString() === "NaN") {
+      return res.status(400).send({ error: 'Year must be a number' });
+    }
+    if (year.toString().length !== 4) {
+      return res.status(400).send({ error: 'Year must take the format yyyy' });
+    }
     return next();
   }
 }

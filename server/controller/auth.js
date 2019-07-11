@@ -27,7 +27,7 @@ class AuthController {
       await upload(req);
     }
 
-
+ 
     const userId = GUID.formGuid();
 
     const findUser = await pool.query(queryHelper.text, [email]);
@@ -45,8 +45,6 @@ class AuthController {
 
     const newUser = await pool.query(queryHelper.createUser, [userId, email, firstname,
       lastname, hashedPassword, img, admin, moment.createdAt]);
-
-    // const newUser = await pool.query(queryHelper.text, [email]);
 
     const token = await Authorization.generateToken(newUser.rows[0]);
 

@@ -168,7 +168,6 @@ describe('Users Authentication', () => {
             .field('isAdmin', 'true')
             .attach('image', './test/files/non-pic.pdf', 'non-pic.pdf')
             .then((res) => {
-                const body = res.body;
                 expect(res.status).to.equal(500);
                 done()
             })
