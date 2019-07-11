@@ -126,7 +126,7 @@ describe('Bookings', () => {
             })
             .then((res) => {
                 const body = res.body;
-                expect(res.status).to.equal(400);
+                expect(res.status).to.equal(404);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('error');
                 expect(body.status).to.equal("error");
@@ -142,7 +142,6 @@ describe('Bookings', () => {
             .set('authorization', token)
             .send({
                 tripId: tripId,
-                seat: 1
             })
             .then((res) => {
                 const body = res.body;
@@ -150,7 +149,6 @@ describe('Bookings', () => {
                 expect(res.status).to.equal(201);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
-                expect(body.data).to.contain.property('id');
                 expect(body.status).to.equal("success");
                 expect(body.data).to.be.an("object");
                 done()
@@ -224,7 +222,6 @@ describe('Bookings', () => {
               expect(res.status).to.equal(201);
               expect(body).to.contain.property('status');
               expect(body).to.contain.property('data');
-              expect(body.data).to.contain.property('id');
               expect(body.status).to.equal("success");
               expect(body.data).to.be.an("object");
               done()

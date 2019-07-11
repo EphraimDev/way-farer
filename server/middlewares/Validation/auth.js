@@ -1,4 +1,4 @@
-import Regex from "../../helper/regex";
+import Regex from '../../helper/regex';
 
 /**
  * @exports
@@ -15,7 +15,6 @@ class AuthValidation {
         * @return {json} res.json
         */
   static validateNames(req, res, next) {
-
     const {
       firstname,
       lastname,
@@ -41,9 +40,8 @@ class AuthValidation {
       * @return {json} res.json
       */
   static validateEmail(req, res, next) {
-
     const {
-      email
+      email,
     } = req.body;
 
     if (typeof email !== 'string' || email.toString().trim() === '' || Regex.emailRegex.test(email) === false) {
@@ -52,7 +50,7 @@ class AuthValidation {
     return next();
   }
 
-  
+
   /**
       * Validate Password
       *
@@ -62,17 +60,16 @@ class AuthValidation {
       * @param {function} next - middleware next (for error handling)
       * @return {json} res.json
       */
-     static validatePassword(req, res, next) {
+  static validatePassword(req, res, next) {
+    const {
+      password,
+    } = req.body;
 
-      const {
-        password,
-      } = req.body;
-
-  if (typeof password !== 'string' || password.toString().trim() === '' || Regex.passwordRegex.test(password) === false) {
-        return res.status(400).send({ error: 'Password must contain minimum of eight characters, at least one uppercase letter, one lowercase letter, one number and one special character' });
-      }
-      return next();
+    if (typeof password !== 'string' || password.toString().trim() === '' || Regex.passwordRegex.test(password) === false) {
+      return res.status(400).send({ error: 'Password must contain minimum of eight characters, at least one uppercase letter, one lowercase letter, one number and one special character' });
     }
+    return next();
+  }
 }
 
 export default AuthValidation;

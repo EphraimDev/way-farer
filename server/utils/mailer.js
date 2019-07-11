@@ -37,11 +37,11 @@ class Mailer {
       if (error) {
         return 'failed';
       }
-      console.log(info.messageId)
+      console.log(info.messageId);
     });
 
-    return 'success'
-  }  
+    return 'success';
+  }
 
   /**
    * Sends Mail after user succesfully creates an account
