@@ -99,7 +99,6 @@ describe('Trips', () => {
           expect(res.status).to.equal(201);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('data');
-          expect(body.data).to.contain.property('id');
           expect(body.status).to.equal('success');
           expect(body.data).to.be.an('object');
           done();

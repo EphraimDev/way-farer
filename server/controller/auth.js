@@ -6,6 +6,7 @@ import queryHelper from '../helper/query';
 import Mailer from '../utils/mailer';
 import GUID from '../utils/guid';
 import upload from '../utils/cloudinary';
+import jsonResponse from '../helper/responseHandler';
 
 /**
  * @exports
@@ -23,20 +24,16 @@ class AuthController {
       firstname, lastname, email, password, isAdmin,
     } = req.body;
 
-    if (req.file) {
-      await upload(req);
-    }
+    if (req.file) await upload(req);
+    
 
- 
+
     const userId = GUID.formGuid();
 
     const findUser = await pool.query(queryHelper.text, [email]);
 
     if (findUser.rowCount >= 1) {
-      return res.status(409).json({
-        status: 'error',
-        error: 'User exists already',
-      });
+      return jsonResponse.error(res, 'error', 409, 'User exists already');
     }
 
     const admin = isAdmin === 'true';
@@ -50,13 +47,12 @@ class AuthController {
 
     Mailer.createAccountMessage(email);
 
-    return res.status(201).json({
-      status: 'success',
-      data: {
-        token,
-        ...newUser.rows[0],
-      },
-    });
+    const data = {
+      token,
+      ...newUser.rows[0],
+    };
+
+    return jsonResponse.success(res, 'success', 201, data);
   }
 
   /**
@@ -71,10 +67,7 @@ class AuthController {
     const findUser = await pool.query(queryHelper.text, [email]);
 
     if (findUser.rowCount < 1) {
-      return res.status(404).json({
-        status: 'error',
-        error: 'User does not exist',
-      });
+      return jsonResponse.error(res, 'error', 404, 'User does not exist');
     }
 
 
@@ -83,18 +76,15 @@ class AuthController {
     if (verify === true) {
       const token = await Authorization.generateToken(findUser.rows[0]);
 
-      return res.status(200).json({
-        status: 'success',
-        data: {
-          token,
-          ...findUser.rows[0],
-        },
-      });
+      const data = {
+        token,
+        ...findUser.rows[0],
+      };
+
+      return jsonResponse.success(res, 'success', 200, data);
     }
-    return res.status(401).json({
-      status: 'error',
-      error: 'Email or password incorrect',
-    });
+    
+    return jsonResponse.error(res, 'error', 401, 'Email or password incorrect');
   }
 
   /**
@@ -115,27 +105,19 @@ class AuthController {
    * @return {json} res.json
    */
   static async updateProfile(req, res) {
-    const {
-      firstname, lastname, isAdmin, password,
-    } = req.body;
+    const {firstname, lastname, isAdmin, password} = req.body;
 
     const { userId } = req.params;
 
     const findUser = await pool.query(queryHelper.userId, [userId]);
 
     if (findUser.rowCount < 1) {
-      return res.status(404).json({
-        status: 'error',
-        error: 'User does not exist',
-      });
+      return jsonResponse.error(res, 'error', 404, 'User does not exist');
     }
 
     if (userId !== req.user.user_id) {
-      return res.status(401).json({
-        status: 'error',
-        error: 'User not authorized',
-      });
-    }
+      return jsonResponse.error(res, 'error', 401, 'User not authorized');
+    } 
 
     const firstName = firstname !== undefined ? firstname : findUser.rows[0].first_name;
     const lastName = lastname !== undefined ? lastname : findUser.rows[0].last_name;
@@ -152,10 +134,7 @@ class AuthController {
     const updatedUser = await pool.query(queryHelper.updateUser,
       [firstName, lastName, pass, image, admin, moment.updatedAt, userId]);
 
-    return res.status(200).json({
-      status: 'success',
-      data: updatedUser.rows[0],
-    });
+      return jsonResponse.success(res, 'success', 200, updatedUser.rows[0]);
   }
 }
 

@@ -11,7 +11,7 @@ class BusValidation {
           * @return {json} res.json
           */
   static company(req, res, next) {
-    const { manufacturer, model, year} = req.body;
+    const { manufacturer, model, year } = req.body;
 
     if (manufacturer.toString().trim() === '') {
       return res.status(400).send({ error: 'Manufacturer is missing' });
@@ -19,7 +19,7 @@ class BusValidation {
     if (model.toString().trim() === '') {
       return res.status(400).send({ error: 'Model of bus is missing' });
     }
-    if (Number(year).toString() === "NaN") {
+    if (Number(year).toString() === 'NaN') {
       return res.status(400).send({ error: 'Year must be a number' });
     }
     if (year.toString().length !== 4) {
@@ -28,10 +28,10 @@ class BusValidation {
     return next();
   }
 
-  static physicalProps(req,res,next){
-    const {numberPlate, capacity} = req.body;
+  static physicalProps(req, res, next) {
+    const { numberPlate, capacity } = req.body;
 
-    
+
     if (numberPlate.toString().trim() === '') {
       return res.status(400).json({ error: 'Number plate is missing' });
     }
@@ -42,9 +42,9 @@ class BusValidation {
   }
 
   static year(req, res, next) {
-    const { year} = req.body;
+    const { year } = req.body;
 
-    if (Number(year).toString() === "NaN") {
+    if (Number(year).toString() === 'NaN') {
       return res.status(400).send({ error: 'Year must be a number' });
     }
     if (year.toString().length !== 4) {

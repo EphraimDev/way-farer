@@ -3,6 +3,7 @@ import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 import guid from '../utils/guid';
 import upload from '../utils/cloudinary';
+import jsonResponse from '../helper/responseHandler';
 
 /**
  * @exports
@@ -23,41 +24,32 @@ class BusController {
    */
   static async addBus(req, res) {
     const {
-      numberPlate, manufacturer, model, year, capacity, color, image,
+      numberPlate, manufacturer, model, year, capacity, color
     } = req.body;
 
     const busId = guid.formGuid();
 
     if (req.user.is_admin !== true) {
-      return res.status(401).json({
-        status: 'error',
-        error: 'Admin access only',
-      });
+      return jsonResponse.error(res, 'error', 401, 'Admin access only');
     }
 
     const findBus = await pool.query(queryHelper.getBus, [numberPlate]);
 
     if (findBus.rowCount >= 1) {
-      return res.status(409).json({
-        status: 'error',
-        error: 'A bus with same plate number already exists',
-      });
+      return jsonResponse.error(res, 'error', 409, 'A bus with same plate number already exists');
     }
 
     if (req.file) {
       await upload(req);
     }
 
-    const img = !req.body.imageURL ? '' : req.body.imageURL;;
+    const img = !req.body.imageURL ? '' : req.body.imageURL;
 
     const newBus = await pool.query(queryHelper.addBus,
       [busId, req.user.user_id, numberPlate, manufacturer,
         model, year, capacity, color, img, moment.createdAt]);
 
-    return res.status(201).json({
-      status: 'success',
-      data: newBus.rows[0],
-    });
+        return jsonResponse.success(res, 'success', 201, newBus.rows[0]);
   }
 }
 

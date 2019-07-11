@@ -3,6 +3,7 @@ import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 import guid from '../utils/guid';
+import jsonResponse from '../helper/responseHandler';
 
 /**
  * @exports
@@ -18,61 +19,66 @@ class BookingController {
    * @return {json} res.json
    */
   static async bookTrip(req, res) {
-    const {
-      tripId, seat,
-    } = req.body;
+    const { tripId, seat } = req.body;
 
     const findTrip = await BookingController.findTrip(tripId, res);
 
     if (findTrip === false) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'This trip does not exist',
-      });
+      return jsonResponse.error(res, 'error', 404, 'This trip does not exist');
     }
 
     const {
-      status, bus_id, todaydate, tripDate,
+      status, bus_id, todaydate, tripDate, realDate
     } = await BookingController.tripStatus(findTrip);
 
     const findBus = await BookingController.findBus(bus_id, res);
 
-    const { capacity } = findBus;
-
-
     const booked = await pool.query(queryHelper.allTripBooking, [tripId]);
 
-    if (capacity <= booked.rowCount || status === 'Cancelled' || status === 'Ended' || tripDate <= todaydate) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'Select another trip',
-      });
+    if (findBus.capacity <= booked.rowCount || status === 'Cancelled' || status === 'Ended' || tripDate <= todaydate) {
+      return jsonResponse.error(res, 'error', 400, 'Select another trip');
     }
 
     if (seat && booked.rowCount > 0) {
       const checkSeat = await BookingController.checkSeat(booked.rows, seat);
 
       if (checkSeat !== undefined) {
-        return res.status(400).json({
-          status: 'error',
-          error: 'Seat number is not available',
-        });
+        return jsonResponse.error(res, 'error', 400, 'Seat number is not available');
       }
     }
 
+    let seatNumber = seat;
+    if (!seat) {
+      if(booked.rowCount > 0){
+        seatNumber = BookingController.assignSeatNumber(booked.rows[0], findBus.capacity);
+      }else{
+        seatNumber = 1;
+      }
+      
+    }
 
-    const { user_id } = req.user;
     const bookId = guid.formGuid();
 
-    await pool.query(queryHelper.bookTrip,
-      [bookId, user_id, tripId, seat, moment.createdAt]);
+    const newBooking = await pool.query(queryHelper.bookTrip,
+      [bookId, req.user.user_id, tripId, seatNumber, moment.createdAt]);
 
-    const newBooking = await BookingController.getBooking(bookId);
+    const user = await await pool.query(queryHelper.userId, [req.user.user_id]);
 
-    return res.status(201).json({
-      status: 'success',
-      data: newBooking,
-    });
+    const data = {
+      ...newBooking.rows[0],
+      user_id: req.user.user_id,
+      first_name: user.rows[0].first_name,
+      last_name: user.rows[0].last_name,
+      email: user.rows[0].email,
+      bus_id,
+      trip_date: realDate,
+      trip_time: findTrip.trip_time,
+      origin: findTrip.origin,
+      destination: findTrip.destination,
+      fare: findTrip.fare,
+    };
+
+    return jsonResponse.success(res, 'success', 201, data);
   }
 
   /**
@@ -83,6 +89,38 @@ class BookingController {
     const checkSeat = bookings.find(({ seat_number }) => seat_number === seat);
 
     return checkSeat;
+  }
+
+  /**
+   * Assign Seat Number
+   * @staticmethod
+   */
+  static async assignSeatNumber(bookings, capacity) {
+
+    let capacityArr = [];
+    let takenSeats = [];
+    for (let i = 1; i <= capacity; i++) {
+      capacityArr.push(i)   
+    };
+    
+    await bookings.forEach(({ seat_number }) => {
+      takenSeats.push(seat_number)
+    }); 
+    
+    const newSeat = BookingController.fetchSeat(capacityArr, takenSeats);
+
+    return newSeat;
+  }
+
+  /**
+   * Assign Seat Number
+   * @staticmethod
+   */
+  static async fetchSeat(capacity, taken) {
+
+    const seat = capacity.find(num => taken.includes(num) === false);
+
+    return seat;
   }
 
   /**
@@ -107,9 +145,11 @@ class BookingController {
     const { status, bus_id } = findTrip;
     const todaydate = new Date().getTime();
     const tripDate = new Date(findTrip.trip_date).getTime();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const realDate = findTrip.trip_date.toLocaleDateString("en-US", options)
 
     return {
-      status, bus_id, todaydate, tripDate,
+      status, bus_id, todaydate, tripDate, realDate
     };
   }
 
@@ -153,16 +193,10 @@ class BookingController {
     }
 
     if (bookings.rowCount <= 0 || bookings.length <= 0) {
-      return res.status(404).json({
-        status: 'error',
-        error: 'There are no bookings',
-      });
+      return jsonResponse.error(res, 'error', 404, 'There are no bookings');
     }
 
-    return res.status(200).json({
-      status: 'success',
-      data: bookings.rows,
-    });
+    return jsonResponse.success(res, 'success', 200, bookings.rows)
   }
 
   /**
@@ -180,10 +214,7 @@ class BookingController {
     const bookingDetails = await pool.query(queryHelper.matchBooking, [user_id, bookingId]);
 
     if (bookingDetails.rowCount === 0) {
-      return res.status(404).json({
-        error: 'Booking does not belong to user',
-        status: 'error',
-      });
+      return jsonResponse.error(res, 'error', 404, 'Booking does not belong to user');
     }
 
     const { trip_id } = bookingDetails.rows[0];
@@ -195,17 +226,12 @@ class BookingController {
     const tripStart = new Date(`${trip_date.toLocaleDateString()} ${trip_time}`);
 
     if (tripStart <= new Date()) {
-      return res.status(400).json({
-        status: 'error',
-        error: 'This booking cannot be deleted',
-      });
+      return jsonResponse.error(res, 'error', 400, 'This booking cannot be deleted');
     }
 
     await pool.query(queryHelper.deleteBooking, [bookingId]);
 
-    return res.status(200).json({
-      status: 'success',
-    });
+    return jsonResponse.success(res, 'success', 200, null)
   }
 }
 
