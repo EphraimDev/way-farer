@@ -99,9 +99,9 @@ class TripController {
     const { origin, destination } = req.query;
 
     if (!origin && destination) {
-      return TripController.searchTripsByDestination(destination, res);
+      return TripController.searchTripsByQuery(null, destination, res);
     } if (origin && !destination) {
-      return TripController.searchTripsByOrigin(origin, res);
+      return TripController.searchTripsByQuery(origin, null, res);
     }
 
     return TripController.getAllTrips(req, res);
@@ -114,25 +114,13 @@ class TripController {
    * @param {object} res - Response object
    * @return {json} res.json
    */
-  static async searchTripsByOrigin(origin, res) {
-    const trips = await pool.query(queryHelper.searchTripByOrigin, [origin]);
-
-    if (trips.rowCount <= 0) {
-      return jsonResponse.error(res, 'error', 404, 'There are no trips');
+  static async searchTripsByQuery(origin, destination, res) {
+    let trips = '';
+    if (destination === null) {
+      trips = await pool.query(queryHelper.searchTripByOrigin, [origin]);
+    } else if (origin === null) {
+      trips = await pool.query(queryHelper.searchTripByDestination, [destination]);
     }
-
-    return jsonResponse.success(res, 'success', 200, trips.rows);
-  }
-
-  /**
-   * Search for trips by origin
-   * @staticmethod
-   * @param  {object} req - Request object
-   * @param {object} res - Response object
-   * @return {json} res.json
-   */
-  static async searchTripsByDestination(destination, res) {
-    const trips = await pool.query(queryHelper.searchTripByDestination, [destination]);
 
     if (trips.rowCount <= 0) {
       return jsonResponse.error(res, 'error', 404, 'There are no trips');

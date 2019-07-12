@@ -32,13 +32,13 @@ class AuthController {
 
     const admin = isAdmin === 'true';
     const hashedPassword = await bcrypt.hashSync(password, 10);
-    await AuthController.uploadImage(req);
-    const img = req.body.imageURL !== null || req.body.imageURL !== undefined ? req.body.imageURL : '';
 
+    const img = '';
+    const { image } = await AuthController.uploadImage(req, img);
 
     const userId = GUID.formGuid();
     const newUser = await pool.query(queryHelper.createUser, [userId, email, firstname,
-      lastname, hashedPassword, img, admin, moment.createdAt]);
+      lastname, hashedPassword, image, admin, moment.createdAt]);
 
     const token = await Authorization.generateToken(newUser.rows[0]);
 
@@ -115,8 +115,10 @@ class AuthController {
     }
 
     const {
-      firstName, lastName, admin, pass, image,
+      firstName, lastName, admin, pass,
     } = await AuthController.bodyParams(req, findUser.rows[0]);
+
+    const { image } = await AuthController.uploadImage(req, findUser.rows[0].img);
 
     const updatedUser = await pool.query(queryHelper.updateUser,
       [firstName, lastName, pass, image, admin, moment.updatedAt, userId]);
@@ -124,30 +126,30 @@ class AuthController {
     return jsonResponse.success(res, 'success', 200, updatedUser.rows[0]);
   }
 
-  static async uploadImage(req) {
+  static async uploadImage(req, image) {
+    let img = '';
     if (req.file) {
       await upload(req);
+      img = req.body.imageURL !== null || req.body.imageURL !== undefined ? req.body.imageURL
+        : image;
     }
+
+    return img;
   }
 
   static async bodyParams(req, findUser) {
     const {
       firstname, lastname, isAdmin, password,
     } = req.body;
-    
+
     const firstName = firstname !== undefined ? firstname : findUser.first_name;
     const lastName = lastname !== undefined ? lastname : findUser.last_name;
     const admin = isAdmin !== undefined ? isAdmin : findUser.is_admin;
     const pass = password !== undefined ? await bcrypt.hashSync(password, 10)
       : findUser.password;
 
-    let image = findUser.img;
-    await AuthController.uploadImage(req);
-    image = req.body.imageURL !== null || req.body.imageURL !== undefined ? req.body.imageURL
-      : image;
-
     return {
-      firstName, lastName, admin, pass, image,
+      firstName, lastName, admin, pass,
     };
   }
 }

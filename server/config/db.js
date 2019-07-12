@@ -3,19 +3,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config = {
-  development: {
-    username: process.env.DEV_USERNAME,
-    password: process.env.DEV_PASSWORD,
-    database: process.env.DEV_DATABASE,
-    host: process.env.DEV_HOST,
-    url: process.env.DATABASE_URL,
-  },
-  test: {
-    username: process.env.TEST_DB_USER,
-    password: process.env.TEST_DB_PASS,
-    database: process.env.TEST_DB_DATABASE,
-    name: process.env.TEST_DB_NAME,
-    host: process.env.TEST_DB_HOST,
+  db: {
+    username: process.env.NODE_ENV === 'test' ? process.env.TEST_DB_USER : process.env.DEV_USERNAME,
+    password: process.env.NODE_ENV === 'test' ? process.env.TEST_DB_PASS : process.env.DEV_PASSWORD,
+    database: process.env.NODE_ENV === 'test' ? process.env.TEST_DB_DATABASE : process.env.DEV_DATABASE,
+    host: process.env.NODE_ENV === 'test' ? process.env.TEST_DB_HOST : process.env.DEV_HOST,
   },
   cloudinary: {
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
