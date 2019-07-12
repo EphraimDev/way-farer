@@ -24,12 +24,6 @@ class AuthController {
       firstname, lastname, email, password, isAdmin,
     } = req.body;
 
-    if (req.file) await upload(req);
-    
-
-
-    const userId = GUID.formGuid();
-
     const findUser = await pool.query(queryHelper.text, [email]);
 
     if (findUser.rowCount >= 1) {
@@ -37,9 +31,12 @@ class AuthController {
     }
 
     const admin = isAdmin === 'true';
-    const img = !req.body.imageURL ? '' : req.body.imageURL;
     const hashedPassword = await bcrypt.hashSync(password, 10);
+    await AuthController.uploadImage(req);
+    const img = req.body.imageURL !== null || req.body.imageURL !== undefined ? req.body.imageURL : '';
 
+
+    const userId = GUID.formGuid();
     const newUser = await pool.query(queryHelper.createUser, [userId, email, firstname,
       lastname, hashedPassword, img, admin, moment.createdAt]);
 
@@ -83,7 +80,7 @@ class AuthController {
 
       return jsonResponse.success(res, 'success', 200, data);
     }
-    
+
     return jsonResponse.error(res, 'error', 401, 'Email or password incorrect');
   }
 
@@ -105,8 +102,6 @@ class AuthController {
    * @return {json} res.json
    */
   static async updateProfile(req, res) {
-    const {firstname, lastname, isAdmin, password} = req.body;
-
     const { userId } = req.params;
 
     const findUser = await pool.query(queryHelper.userId, [userId]);
@@ -117,24 +112,43 @@ class AuthController {
 
     if (userId !== req.user.user_id) {
       return jsonResponse.error(res, 'error', 401, 'User not authorized');
-    } 
-
-    const firstName = firstname !== undefined ? firstname : findUser.rows[0].first_name;
-    const lastName = lastname !== undefined ? lastname : findUser.rows[0].last_name;
-    const admin = isAdmin !== undefined ? isAdmin : findUser.rows[0].is_admin;
-    const pass = password !== undefined ? await bcrypt.hashSync(password, 10)
-      : findUser.rows[0].password;
-
-    let image = findUser.rows[0].img;
-    if (req.file) {
-      await upload(req);
-      image = req.body.imageURL;
     }
+
+    const {
+      firstName, lastName, admin, pass, image,
+    } = await AuthController.bodyParams(req, findUser.rows[0]);
 
     const updatedUser = await pool.query(queryHelper.updateUser,
       [firstName, lastName, pass, image, admin, moment.updatedAt, userId]);
 
-      return jsonResponse.success(res, 'success', 200, updatedUser.rows[0]);
+    return jsonResponse.success(res, 'success', 200, updatedUser.rows[0]);
+  }
+
+  static async uploadImage(req) {
+    if (req.file) {
+      await upload(req);
+    }
+  }
+
+  static async bodyParams(req, findUser) {
+    const {
+      firstname, lastname, isAdmin, password,
+    } = req.body;
+    
+    const firstName = firstname !== undefined ? firstname : findUser.first_name;
+    const lastName = lastname !== undefined ? lastname : findUser.last_name;
+    const admin = isAdmin !== undefined ? isAdmin : findUser.is_admin;
+    const pass = password !== undefined ? await bcrypt.hashSync(password, 10)
+      : findUser.password;
+
+    let image = findUser.img;
+    await AuthController.uploadImage(req);
+    image = req.body.imageURL !== null || req.body.imageURL !== undefined ? req.body.imageURL
+      : image;
+
+    return {
+      firstName, lastName, admin, pass, image,
+    };
   }
 }
 

@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/db';
 import pool from '../model/db';
 import query from '../helper/query';
+import jsonResponse from '../helper/responseHandler';
 
 const secret = config.jwtSecret;
 
@@ -57,18 +58,12 @@ class Authorization {
 
       [req.user] = foundUser.rows;
       if (req.user === undefined) {
-        return res.status(401).json({
-          status: 'error',
-          error: 'Token is invalid',
-        });
+        return jsonResponse.error(res, 'error', 401, 'Token is invalid');
       }
 
       return next();
     } catch (err) {
-      return res.status(401).json({
-        status: 'error',
-        error: 'Token is invalid or not provided',
-      });
+      return jsonResponse.error(res, 'error', 401, 'Token is invalid or not provided');
     }
   }
 
@@ -83,10 +78,7 @@ class Authorization {
    */
   static async checkAdmin(req, res, next) {
     if (req.user.is_admin !== true) {
-      return res.status(401).json({
-        status: 'error',
-        error: 'Admin access only',
-      });
+      return jsonResponse.error(res, 'error', 401, 'Admin access only');
     }
 
     return next();

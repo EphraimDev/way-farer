@@ -24,7 +24,7 @@ class BusController {
    */
   static async addBus(req, res) {
     const {
-      numberPlate, manufacturer, model, year, capacity, color
+      numberPlate, manufacturer, model, year, capacity, color,
     } = req.body;
 
     const busId = guid.formGuid();
@@ -49,7 +49,7 @@ class BusController {
       [busId, req.user.user_id, numberPlate, manufacturer,
         model, year, capacity, color, img, moment.createdAt]);
 
-        return jsonResponse.success(res, 'success', 201, newBus.rows[0]);
+    return jsonResponse.success(res, 'success', 201, newBus.rows[0]);
   }
 }
 

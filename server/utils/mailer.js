@@ -37,7 +37,7 @@ class Mailer {
       if (error) {
         return 'failed';
       }
-      console.log(info.messageId);
+      return console.log(info.messageId);
     });
 
     return 'success';

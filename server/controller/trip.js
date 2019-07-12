@@ -22,10 +22,6 @@ class TripController {
       busId, origin, destination, tripDate, tripTime, fare,
     } = req.body;
 
-    if (req.user.is_admin !== true) {
-      return jsonResponse.error(res, 'error', 401, 'Admin access only');
-    }
-
     const tripId = guid.formGuid();
 
     const findBus = await pool.query(queryHelper.getBusById, [busId]);

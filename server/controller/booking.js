@@ -28,7 +28,7 @@ class BookingController {
     }
 
     const {
-      status, bus_id, todaydate, tripDate, realDate
+      status, bus_id, todaydate, tripDate, realDate,
     } = await BookingController.tripStatus(findTrip);
 
     const findBus = await BookingController.findBus(bus_id, res);
@@ -49,12 +49,11 @@ class BookingController {
 
     let seatNumber = seat;
     if (!seat) {
-      if(booked.rowCount > 0){
+      if (booked.rowCount > 0) {
         seatNumber = BookingController.assignSeatNumber(booked.rows[0], findBus.capacity);
-      }else{
+      } else {
         seatNumber = 1;
       }
-      
     }
 
     const bookId = guid.formGuid();
@@ -96,17 +95,17 @@ class BookingController {
    * @staticmethod
    */
   static async assignSeatNumber(bookings, capacity) {
+    const capacityArr = [];
+    const takenSeats = [];
+    for (let i = 1; i <= capacity;) {
+      capacityArr.push(i);
+      i += 1;
+    }
 
-    let capacityArr = [];
-    let takenSeats = [];
-    for (let i = 1; i <= capacity; i++) {
-      capacityArr.push(i)   
-    };
-    
     await bookings.forEach(({ seat_number }) => {
-      takenSeats.push(seat_number)
-    }); 
-    
+      takenSeats.push(seat_number);
+    });
+
     const newSeat = BookingController.fetchSeat(capacityArr, takenSeats);
 
     return newSeat;
@@ -117,7 +116,6 @@ class BookingController {
    * @staticmethod
    */
   static async fetchSeat(capacity, taken) {
-
     const seat = capacity.find(num => taken.includes(num) === false);
 
     return seat;
@@ -145,11 +143,13 @@ class BookingController {
     const { status, bus_id } = findTrip;
     const todaydate = new Date().getTime();
     const tripDate = new Date(findTrip.trip_date).getTime();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const realDate = findTrip.trip_date.toLocaleDateString("en-US", options)
+    const options = {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    };
+    const realDate = findTrip.trip_date.toLocaleDateString('en-US', options);
 
     return {
-      status, bus_id, todaydate, tripDate, realDate
+      status, bus_id, todaydate, tripDate, realDate,
     };
   }
 
@@ -196,7 +196,7 @@ class BookingController {
       return jsonResponse.error(res, 'error', 404, 'There are no bookings');
     }
 
-    return jsonResponse.success(res, 'success', 200, bookings.rows)
+    return jsonResponse.success(res, 'success', 200, bookings.rows);
   }
 
   /**
@@ -231,7 +231,7 @@ class BookingController {
 
     await pool.query(queryHelper.deleteBooking, [bookingId]);
 
-    return jsonResponse.success(res, 'success', 200, null)
+    return jsonResponse.success(res, 'success', 200, null);
   }
 }
 

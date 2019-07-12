@@ -5,7 +5,6 @@
  * @class JSONResponse
  */
 class JSONResponse {
-
   /**
    * @method success
    * @memberof JSONResponse
