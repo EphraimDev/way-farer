@@ -230,9 +230,11 @@ class BookingController {
       return jsonResponse.error(res, 'error', 400, 'This booking cannot be deleted');
     }
 
-    await pool.query(queryHelper.deleteBooking, [booking_id]);
+    await pool.query(queryHelper.deleteBooking, ['1', moment.deletedAt, booking_id]);
 
-    return jsonResponse.success(res, 'success', 200, null);
+    const returnData = await pool.query(queryHelper.cancelBooking, [booking_id]);
+
+    return jsonResponse.success(res, 'success', 200, returnData.rows[0]);
   }
 }
 
