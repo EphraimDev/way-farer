@@ -7,9 +7,9 @@ import app from '../server/app';
 chai.should();
 
 chai.use(chaiHttp);
-let token = 'bearer ';
+let token = '';
 const notToken = 'bearer shdbfkfk';
-let notAdmin = 'bearer ';
+let notAdmin = '';
 
 describe('Buses', () => {
   describe('Get tokens', () => {
@@ -22,7 +22,7 @@ describe('Buses', () => {
         })
         .then((res) => {
           const { body } = res;
-          notAdmin += body.data.token;
+          notAdmin = body.data.token;
           done();
         });
     });
@@ -36,7 +36,7 @@ describe('Buses', () => {
         })
         .then((res) => {
           const { body } = res;
-          token += body.data.token;
+          token = body.data.token;
 
           done();
         });
@@ -47,8 +47,8 @@ describe('Buses', () => {
     it('should add a bus', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -68,8 +68,8 @@ describe('Buses', () => {
     it('should check for bus that already exists', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('Authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -89,8 +89,8 @@ describe('Buses', () => {
     it('should check for invalid token', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', notToken)
-        .field('numberPlate', 'test@test.co')
+        .set('token', notToken)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -110,8 +110,8 @@ describe('Buses', () => {
     it('should check admin access', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', notAdmin)
-        .field('numberPlate', 'test@test.co')
+        .set('token', notAdmin)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -131,8 +131,8 @@ describe('Buses', () => {
     it('should check for wrong number plate format', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', '')
+        .set('token', token)
+        .field('number_plate', '')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -150,8 +150,8 @@ describe('Buses', () => {
     it('should check for wrong manufacturer format', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', '')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -170,8 +170,8 @@ describe('Buses', () => {
     it('should check for wrong model format', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', '')
         .field('year', '1234')
@@ -190,8 +190,8 @@ describe('Buses', () => {
     it('should check for wrong image format', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -206,8 +206,8 @@ describe('Buses', () => {
     it('should check for wrong year', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', 'ed')
@@ -226,8 +226,8 @@ describe('Buses', () => {
     it('should check for wrong year format', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '123')
@@ -246,8 +246,8 @@ describe('Buses', () => {
     it('should check for wrong capacity format', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('authorization', token)
-        .field('numberPlate', 'test@test.co')
+        .set('token', token)
+        .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -268,7 +268,7 @@ describe('Buses', () => {
   //     it('should update a bus data',  (done) => {
   //         chai.request(app)
   //         .put(`/api/v1/bus/update/${busId}`)
-  //         .set('Authorization', token)
+  //         .set('token', token)
   //         .send({
   //             capacity:8
   //         })
@@ -287,7 +287,7 @@ describe('Buses', () => {
   //     it('should check for bus that does not exist', (done) => {
   //         chai.request(app)
   //         .put(`/api/v1/bus/update/${busId}`)
-  //         .set('Authorization', token)
+  //         .set('token', token)
   //         .send({
   //             capacity: 5
   //         })
@@ -308,7 +308,7 @@ describe('Buses', () => {
   //     it('should return all buses',  (done) => {
   //         chai.request(app)
   //         .get('/api/v1/bus/all')
-  //         .set('Authorization', token)
+  //         .set('token', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(201);
@@ -325,7 +325,7 @@ describe('Buses', () => {
   //     it('should return the data of selected bus',  (done) => {
   //         chai.request(app)
   //         .get(`/api/v1/bus/single/${busId}`)
-  //         .set('Authorization', token)
+  //         .set('token', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(201);
@@ -340,7 +340,7 @@ describe('Buses', () => {
   //     it('should return error for bus that does exist',  (done) => {
   //         chai.request(app)
   //         .get(`/api/v1/bus/single/none`)
-  //         .set('Authorization', token)
+  //         .set('token', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(404);
@@ -358,7 +358,7 @@ describe('Buses', () => {
   //     it('should remove the selected bus from the database',  (done) => {
   //         chai.request(app)
   //         .delete(`/api/v1/bus/delete/${busId}`)
-  //         .set('Authorization', token)
+  //         .set('token', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(200);
@@ -371,7 +371,7 @@ describe('Buses', () => {
   //     it('should return error for bus that does exist',  (done) => {
   //         chai.request(app)
   //         .get(`/api/v1/bus/delete/none`)
-  //         .set('Authorization', token)
+  //         .set('token', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(404);

@@ -14,10 +14,10 @@ class TripValidation {
             */
   static bus(req, res, next) {
     const {
-      busId,
+      bus_id,
     } = req.body;
 
-    if (busId.length < 1 || typeof busId !== 'string') {
+    if (bus_id.length < 1 || typeof bus_id !== 'string') {
       return res.status(400).json({ error: 'Bus ID is a string' });
     }
 
@@ -53,15 +53,15 @@ class TripValidation {
 
   static datetime(req, res, next) {
     const {
-      tripDate, tripTime,
+      trip_date, trip_time,
     } = req.body;
 
-    if (typeof tripDate !== 'string' || tripDate.toString().trim() === '') {
+    if (typeof trip_date !== 'string' || trip_date.toString().trim() === '') {
       return res.status(400).send({ error: 'Trip date is a string in format yyyy-mm-dd' });
     }
-    if (typeof tripTime !== 'string' || tripTime.toString().trim() === '') {
-      return res.status(400).send({ error: 'Trip time is a string in format hh:mm:ss' });
-    }
+    // if (typeof trip_time !== 'string' || trip_time.toString().trim() === '') {
+    //   return res.status(400).send({ error: 'Trip time is a string in format hh:mm:ss' });
+    // }
 
     return next();
   }

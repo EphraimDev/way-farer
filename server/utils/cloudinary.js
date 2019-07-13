@@ -10,7 +10,7 @@ const upload = async (req) => {
     });
 
     const result = await cloudinary.uploader.upload(req.file.path);
-
+    
     req.body.imageId = result.public_id;
     req.body.imageURL = result.secure_url;
   } catch (err) {

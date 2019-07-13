@@ -20,9 +20,7 @@ class Mailer {
    * @param {string} message
    * @returns {nothing} returns nothing
    */
-  static sendMail({ to, subject, message }) {
-    // create reusable transporter object
-    const transporter = nodemailer.createTransport(config.mail.smtpConfig);
+  static sendMail({ to, subject, message}) {
 
     // setup email data
     const mailOptions = {
@@ -32,6 +30,8 @@ class Mailer {
       subject,
       html: message,
     };
+
+    const transporter = nodemailer.createTransport(config.mail.smtpConfig);
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -60,7 +60,7 @@ class Mailer {
     return Mailer.sendMail({
       to: email,
       subject: 'Create Account Successful',
-      message,
+      message
     });
   }
 }

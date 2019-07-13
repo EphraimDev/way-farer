@@ -23,10 +23,10 @@ class BusValidation {
   }
 
   static physicalProps(req, res, next) {
-    const { numberPlate, capacity } = req.body;
+    const { number_plate, capacity } = req.body;
 
 
-    if (numberPlate.toString().trim() === '') {
+    if (number_plate.toString().trim() === '') {
       return res.status(400).json({ error: 'Number plate is missing' });
     }
     if (Number(capacity) > 0 === false) {

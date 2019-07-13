@@ -50,7 +50,8 @@ class Authorization {
    */
   static async authorize(req, res, next) {
     try {
-      const token = await req.headers.authorization.split(' ')[1];
+      //const token = await req.headers.token.split(' ')[1];
+      const {token} = req.headers;
 
       const decoded = await jwt.verify(token, secret);
 

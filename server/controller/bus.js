@@ -24,16 +24,14 @@ class BusController {
    */
   static async addBus(req, res) {
     const {
-      numberPlate, manufacturer, model, year, capacity, color,
+      number_plate, manufacturer, model, year, capacity, color,
     } = req.body;
-
-    const busId = guid.formGuid();
 
     if (req.user.is_admin !== true) {
       return jsonResponse.error(res, 'error', 401, 'Admin access only');
     }
 
-    const findBus = await pool.query(queryHelper.getBus, [numberPlate]);
+    const findBus = await pool.query(queryHelper.getBus, [number_plate.toLowerCase()]);
 
     if (findBus.rowCount >= 1) {
       return jsonResponse.error(res, 'error', 409, 'A bus with same plate number already exists');
@@ -45,8 +43,10 @@ class BusController {
 
     const img = !req.body.imageURL ? '' : req.body.imageURL;
 
+    const bus_id = guid.formGuid();
+
     const newBus = await pool.query(queryHelper.addBus,
-      [busId, req.user.user_id, numberPlate, manufacturer,
+      [bus_id, req.user.user_id, number_plate, manufacturer,
         model, year, capacity, color, img, moment.createdAt]);
 
     return jsonResponse.success(res, 'success', 201, newBus.rows[0]);

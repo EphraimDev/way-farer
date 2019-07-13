@@ -19,25 +19,30 @@ class TripController {
    */
   static async addTrip(req, res) {
     const {
-      busId, origin, destination, tripDate, tripTime, fare,
+      bus_id, origin, destination, trip_date, trip_time, fare,
     } = req.body;
 
-    const tripId = guid.formGuid();
+    const trip_id = guid.formGuid();
 
-    const findBus = await pool.query(queryHelper.getBusById, [busId]);
+    const findBus = await pool.query(queryHelper.getBusById, [bus_id]);
 
     if (findBus.rowCount < 1) {
       return jsonResponse.error(res, 'error', 404, 'Selected bus does not exist');
     }
 
-    const findActiveBus = await pool.query(queryHelper.getActiveBus, [busId, 'Active']);
+    const findActiveBus = await pool.query(queryHelper.getActiveBus, [bus_id, 'Active']);
 
     if (findActiveBus.rowCount >= 1) {
       return jsonResponse.error(res, 'error', 409, 'A trip with this bus is active');
     }
 
+    let tripTime = trip_time;
+    if (!trip_time) {
+      const date = new Date();
+      tripTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    }
     const newTrip = await pool.query(queryHelper.addTrip,
-      [tripId, req.user.user_id, busId, origin, destination, tripDate, tripTime, fare, 'Active', moment.createdAt]);
+      [trip_id, req.user.user_id, bus_id, origin.toLowerCase(), destination.toLowerCase(), trip_date, tripTime, fare, 'Active', moment.createdAt]);
 
     return jsonResponse.success(res, 'success', 201, newTrip.rows[0]);
   }
@@ -51,17 +56,17 @@ class TripController {
    * @return {json} res.json
    */
   static async cancelTrip(req, res) {
-    const { tripId } = req.params;
+    const { trip_id } = req.params;
 
-    const findTrip = await pool.query(queryHelper.getTripById, [tripId]);
+    const findTrip = await pool.query(queryHelper.getTripById, [trip_id]);
     if (findTrip.rowCount < 1) {
       return jsonResponse.error(res, 'error', 404, 'Trip does not exist');
     }
 
     const todaydate = new Date().getTime();
-    const tripDate = new Date(findTrip.rows[0].trip_date).getTime();
+    const trip_date = new Date(findTrip.rows[0].trip_date).getTime();
 
-    if (tripDate <= todaydate || findTrip.rows[0] === 'Ended') {
+    if (trip_date <= todaydate || findTrip.rows[0] === 'Ended') {
       return jsonResponse.error(res, 'error', 400, 'Trip cannot be cancelled');
     }
 
@@ -117,9 +122,9 @@ class TripController {
   static async searchTripsByQuery(origin, destination, res) {
     let trips = '';
     if (destination === null) {
-      trips = await pool.query(queryHelper.searchTripByOrigin, [origin]);
+      trips = await pool.query(queryHelper.searchTripByOrigin, [origin.toLowerCase()]);
     } else if (origin === null) {
-      trips = await pool.query(queryHelper.searchTripByDestination, [destination]);
+      trips = await pool.query(queryHelper.searchTripByDestination, [destination.toLowerCase()]);
     }
 
     if (trips.rowCount <= 0) {
@@ -127,6 +132,49 @@ class TripController {
     }
 
     return jsonResponse.success(res, 'success', 200, trips.rows);
+  }
+
+   /**
+   * Update user trip
+   * @param  {object} req - Request object
+   * @param {object} res - Response object
+   * @return {json} res.json
+   */
+  static async updateTrip(req, res) {
+    const { trip_id } = req.params;
+
+    const findTrip = await pool.query(queryHelper.getTrip, [trip_id]);
+
+    if (findTrip.rowCount < 1) {
+      return jsonResponse.error(res, 'error', 404, 'Trip does not exist');
+    }
+
+    const {
+      busId, newOrigin, newDestination, tripDate, tripTime, newFare, newStatus
+    } = await TripController.bodyParams(req, findTrip.rows[0]);
+
+    const updatedTrip = await pool.query(queryHelper.updateTrip,
+      [busId, newOrigin.toLowerCase(), newDestination.toLowerCase(), tripDate, tripTime, newFare, newStatus, moment.updatedAt, trip_id]);
+
+    return jsonResponse.success(res, 'success', 200, updatedTrip.rows[0]);
+  }
+
+  static async bodyParams(req, findTrip) {
+    const {
+      bus_id, origin, destination, trip_date, trip_time, fare, status,
+    } = req.body;
+
+    const busId = bus_id !== undefined ? bus_id : findTrip.bus_id;
+    const newOrigin = origin !== undefined ? origin : findTrip.origin;
+    const newDestination = destination !== undefined ? destination : findTrip.destination;
+    const tripDate = trip_date !== undefined ? trip_date : findTrip.trip_date;
+    const tripTime = trip_time !== undefined ? trip_time : findTrip.trip_time;
+    const newFare = fare !== undefined ? fare : findTrip.fare;
+    const newStatus = status !== undefined ? status : findTrip.status;
+
+    return {
+      busId, newOrigin, newDestination, tripDate, tripTime, newFare, newStatus
+    };
   }
 }
 
