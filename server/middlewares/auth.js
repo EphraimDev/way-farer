@@ -52,9 +52,9 @@ class Authorization {
     try {
       //const token = await req.headers.token.split(' ')[1];
       const {token} = req.headers;
-      const code = token.split(' ');
-      console.log(code[1])
-      const decoded = await jwt.verify(code[1], secret);
+      console.log(token)
+      console.log(req.headers)
+      const decoded = await jwt.verify(token, secret);
 
       const foundUser = await pool.query(query.text, [decoded.email]);
 
