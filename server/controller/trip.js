@@ -157,7 +157,7 @@ class TripController {
 
     const updatedTrip = await pool.query(queryHelper.updateTrip,
       [busId, newOrigin.toLowerCase(), newDestination.toLowerCase(), tripDate, tripTime, newFare, newStatus, moment.updatedAt, trip_id]);
-
+      updatedTrip.rows[0]['message'] = "Updated";
     return jsonResponse.success(res, 'success', 200, updatedTrip.rows[0]);
   }
 

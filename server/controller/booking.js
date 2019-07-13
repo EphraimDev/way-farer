@@ -20,13 +20,10 @@ class BookingController {
    */
   static async bookTrip(req, res) {
     const { trip_id, seat } = req.body;
-    console.log(req.user)
-    console.log(req.body)
 
     const findTrip = await BookingController.findTrip(trip_id, res);
 
     if (findTrip === false) {
-      console.log("post /bookings", "404")
       return jsonResponse.error(res, 'error', 404, 'This trip does not exist');
     }
 
@@ -39,7 +36,6 @@ class BookingController {
     const booked = await pool.query(queryHelper.allTripBooking, [trip_id]);
 
     if (findBus.capacity <= booked.rowCount || status === 'Cancelled' || status === 'Ended' || tripDate <= todaydate) {
-      console.log("post /bookings", "4001")
       return jsonResponse.error(res, 'error', 400, 'Select another trip');
     }
 
@@ -47,7 +43,6 @@ class BookingController {
       const checkSeat = await BookingController.checkSeat(booked.rows, seat);
 
       if (checkSeat !== undefined) {
-        console.log("post /bookings", "400")
         return jsonResponse.error(res, 'error', 400, 'Seat number is not available');
       }
     }
@@ -55,7 +50,7 @@ class BookingController {
     let seatNumber = seat;
     if (!seat) {
       if (booked.rowCount > 0) {
-        seatNumber = BookingController.assignSeatNumber(booked.rows[0], findBus.capacity);
+        seatNumber = await BookingController.assignSeatNumber(booked.rows, findBus.capacity);
       } else {
         seatNumber = 1;
       }
@@ -78,6 +73,7 @@ class BookingController {
       origin: findTrip.origin,
       destination: findTrip.destination,
       fare: findTrip.fare,
+      id: newBooking.rows[0].booking_id
     };
 
     return jsonResponse.success(res, 'success', 201, data);
@@ -109,8 +105,8 @@ class BookingController {
       takenSeats.push(seat_number);
     });
 
-    const newSeat = BookingController.fetchSeat(capacityArr, takenSeats);
-
+    const newSeat = await BookingController.fetchSeat(capacityArr, takenSeats);
+    
     return newSeat;
   }
 
@@ -119,8 +115,8 @@ class BookingController {
    * @staticmethod
    */
   static async fetchSeat(capacity, taken) {
-    const seat = capacity.find(num => taken.includes(num) === false);
-
+    const seat = await capacity.find(num => taken.includes(num) === false);
+    
     return seat;
   }
 
@@ -195,38 +191,12 @@ class BookingController {
     //   bookings = await pool.query(queryHelper.userBooking, [user_id]);
     // }
 
-    console.log(req.user);
     const bookings = await pool.query(queryHelper.adminBooking, []);
 
     if (bookings.rowCount <= 0 || bookings.length <= 0) {
-      console.log("GET /bookings", "404")
       return jsonResponse.error(res, 'error', 404, 'There are no bookings');
     }
 
-  //   let combined = [];
-  //  await bookings.rows.forEach(async(booking, i) => {
-  //     const user = await pool.query(queryHelper.userId, [booking.user_id]);
-  //     const trip = await pool.query(queryHelper.getTrip, [booking.trip_id]);
-      
-  //     const data = {
-  //       booking_id: booking.booking_id,
-  //       user_id: booking.user_id,
-  //       trip_id: booking.trip_id,
-  //       seat_number: booking.seat_number,
-  //       first_name: user.rows[0].first_name,
-  //       last_name: user.rows[0].last_name,
-  //       email: user.rows[0].email,
-  //       bus_id: trip.rows[0].bus_id,
-  //       trip_date: trip.rows[0].trip_date,
-  //       trip_time: trip.rows[0].trip_time,
-  //       origin: trip.rows[0].origin,
-  //       destination: trip.rows[0].destination,
-  //       fare: trip.rows[0].fare
-  //     }
-  //     console.log(data)
-  //     combined.push(data);
-  //   })
-  //   console.log(combined)
     return jsonResponse.success(res, 'success', 200, bookings.rows);
   }
 
@@ -245,7 +215,6 @@ class BookingController {
     const bookingDetails = await pool.query(queryHelper.matchBooking, [user_id, booking_id]);
 
     if (bookingDetails.rowCount === 0) {
-      console.log("delete /bookings", "404")
       return jsonResponse.error(res, 'error', 404, 'Booking does not belong to user');
     }
 
@@ -258,7 +227,6 @@ class BookingController {
     const tripStart = new Date(`${trip_date.toLocaleDateString()} ${trip_time}`);
 
     if (tripStart <= new Date()) {
-      console.log("DELETE /bookings", "400")
       return jsonResponse.error(res, 'error', 400, 'This booking cannot be deleted');
     }
 
