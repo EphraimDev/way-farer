@@ -6,7 +6,9 @@ import upload from '../utils/multer';
 
 const router = express.Router();
 
-router.post('/', auth.authorize, auth.checkAdmin, upload.single('image'),
-  validate.year, validate.company, validate.physicalProps, bus.addBus);
+router.post('/', auth.authorize, auth.checkAdmin, upload.single('image'), bus.addBus);
+
+  // router.post('/', auth.authorize, auth.checkAdmin, upload.single('image'),
+  // validate.year, validate.company, validate.physicalProps, bus.addBus);
 
 export default router;
