@@ -22,8 +22,8 @@
     "build": "babel ./server --out-dir dist",
     "prod": "cross-env NODE_ENV=development npm-run-all clean build start:prod",
     "start:prod": "npm-run-all prod:db:create prod:db:seed start",
-    "prod:db:create": "babel-node server/migrations/table",
-    "prod:db:seed": "babel-node server/seeders/seed",
+    "prod:db:create": "node dist/migrations/table",
+    "prod:db:seed": "node dist/seeders/seed",
     "test-db": "cross-env NODE_ENV=test babel-node server/migrations/table"
   },
   "repository": {
