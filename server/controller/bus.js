@@ -46,7 +46,7 @@ class BusController {
     const bus_id = guid.formGuid();
 
     const newBus = await pool.query(queryHelper.addBus,
-      [bus_id, req.user.user_id, number_plate, manufacturer,
+      [req.user.user_id, number_plate, manufacturer,
         model, year, capacity, color, img, moment.createdAt]);
 
     return jsonResponse.success(res, 'success', 201, newBus.rows[0]);

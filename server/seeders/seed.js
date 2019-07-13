@@ -2,7 +2,6 @@ import pool from '../model/db';
 
 const text =
 `INSERT INTO users(
-    user_id,
     first_name, 
     last_name,
     is_admin,
@@ -11,7 +10,6 @@ const text =
     img,
     created_at
 ) VALUES(
-    '116e6a3c-2528-f165-f78c-94435cea4ab5',
     'Chima',
     'Amodu',
     false,
@@ -22,7 +20,6 @@ const text =
 );
 
 INSERT INTO bus(
-  bus_id,
   user_id,
   number_plate, 
   manufacturer,
@@ -33,8 +30,7 @@ INSERT INTO bus(
   img,
   created_at
 ) VALUES(
-  'be151b77-1cbe-431e-0783-f0706489c8aa',
-  '116e6a3c-2528-f165-f78c-94435cea4ab5',
+  1,
   'Ahmed',
   'Fred',
   'Ghana',
@@ -46,7 +42,6 @@ INSERT INTO bus(
 );
 INSERT INTO trip
 (
-    trip_id,
     bus_id,
     user_id,
     origin,
@@ -57,9 +52,8 @@ INSERT INTO trip
     status,
     created_at
 ) VALUES(
-  'a7e48835-9e8c-5f03-494e-cbdbc975f5ec',
-  'be151b77-1cbe-431e-0783-f0706489c8aa',
-  '116e6a3c-2528-f165-f78c-94435cea4ab5',
+  1,
+  1,
   'Ebuka',
   'Jerry',
   '2018-07-05 22:46:19',
@@ -70,15 +64,13 @@ INSERT INTO trip
 );
 INSERT INTO booking
 (
-  booking_id,
   trip_id,
   user_id,
   seat_number,
   created_at
 ) VALUES(
-  'be151b77-1cbe-431e-0783-f0706489c9aa',
-  'a7e48835-9e8c-5f03-494e-cbdbc975f5ec',
-  '116e6a3c-2528-f165-f78c-94435cea4ab5',
+  1,
+  1,
   3,
   '2018-07-05 22:46:19'
 )`;

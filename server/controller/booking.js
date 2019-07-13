@@ -56,10 +56,8 @@ class BookingController {
       }
     }
 
-    const book_id = guid.formGuid();
-
     const newBooking = await pool.query(queryHelper.bookTrip,
-      [book_id, req.user.user_id, trip_id, seatNumber, moment.createdAt]);
+      [req.user.user_id, trip_id, seatNumber, moment.createdAt]);
 
     const user = await await pool.query(queryHelper.userId, [req.user.user_id]);
 

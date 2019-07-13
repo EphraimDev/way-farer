@@ -4,7 +4,6 @@ import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 import Mailer from '../utils/mailer';
-import GUID from '../utils/guid';
 import upload from '../utils/cloudinary';
 import jsonResponse from '../helper/responseHandler';
 
@@ -35,10 +34,8 @@ class AuthController {
 
     const img = '';
     const { image } = await AuthController.uploadImage(req, img);
-
-    const userId = GUID.formGuid();
     
-    const newUser = await pool.query(queryHelper.createUser, [userId, email.toLowerCase(), first_name,
+    const newUser = await pool.query(queryHelper.createUser, [email.toLowerCase(), first_name,
       last_name, hashedPassword, image, admin, moment.createdAt]);
 
     const token = await Authorization.generateToken(newUser.rows[0]);

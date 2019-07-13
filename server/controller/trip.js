@@ -23,7 +23,6 @@ class TripController {
     } = req.body;
     console.log(req.user)
     console.log(req.body)
-    const trip_id = guid.formGuid();
 
     const findBus = await pool.query(queryHelper.getBusById, [bus_id]);
 
@@ -43,7 +42,7 @@ class TripController {
       tripTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
     const newTrip = await pool.query(queryHelper.addTrip,
-      [trip_id, req.user.user_id, bus_id, origin.toLowerCase(), destination.toLowerCase(), trip_date, tripTime, fare, 'Active', moment.createdAt]);
+      [req.user.user_id, bus_id, origin.toLowerCase(), destination.toLowerCase(), trip_date, tripTime, fare, 'Active', moment.createdAt]);
 
     return jsonResponse.success(res, 'success', 201, newTrip.rows[0]);
   }
