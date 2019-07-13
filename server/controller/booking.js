@@ -20,6 +20,8 @@ class BookingController {
    */
   static async bookTrip(req, res) {
     const { trip_id, seat } = req.body;
+    console.log(req.user)
+    console.log(req.body)
 
     const findTrip = await BookingController.findTrip(trip_id, res);
 
