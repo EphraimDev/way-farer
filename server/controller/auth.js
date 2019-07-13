@@ -30,7 +30,7 @@ class AuthController {
       return jsonResponse.error(res, 'error', 409, 'User exists already');
     }
 
-    const admin = is_admin === 'true';
+    const admin = is_admin === true? is_admin: false;
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
     const img = '';
