@@ -233,6 +233,7 @@ class BookingController {
     await pool.query(queryHelper.deleteBooking, ['1', moment.deletedAt, booking_id]);
 
     const returnData = await pool.query(queryHelper.cancelBooking, [booking_id]);
+    returnData.rows[0]['message'] = "Updated";
 
     return jsonResponse.success(res, 'success', 200, returnData.rows[0]);
   }
