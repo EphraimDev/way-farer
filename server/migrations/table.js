@@ -5,7 +5,9 @@ pool.on('connect', () => {
   console.log('Connected to the database');
 });
 
-const queryText = `DROP TABLE IF EXISTS booking trip bus users CASCADE;
+const queryText = `DROP TABLE IF EXISTS booking, trip, bus, users CASCADE;
+
+  DROP TYPE IF EXISTS action;
 
   CREATE TYPE action AS ENUM
   ('Active', 'Cancelled', 'Ended');
@@ -18,7 +20,7 @@ const queryText = `DROP TABLE IF EXISTS booking trip bus users CASCADE;
       first_name VARCHAR(128) NOT NULL,
       last_name VARCHAR(128) NOT NULL,
       password VARCHAR(128) NOT NULL,
-      img VARCHAR(128),
+      img VARCHAR(500),
       is_admin BOOLEAN NOT NULL,
       created_at TIMESTAMP,
       updated_at TIMESTAMP,
@@ -85,3 +87,5 @@ pool
     console.log(err);
     pool.end();
   });
+
+  
