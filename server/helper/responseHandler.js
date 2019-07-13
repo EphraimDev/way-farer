@@ -10,11 +10,12 @@ class JSONResponse {
    * @memberof JSONResponse
    * @param {object} user
    */
-  static async success(res, message, code, data) {
+  static async success(res, status, code, data, message=null) {
     res.status(code);
     res.json({
-      message,
+      status,
       data,
+      message
     });
   }
 
