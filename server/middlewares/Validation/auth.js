@@ -1,5 +1,3 @@
-import Regex from '../../helper/regex';
-
 /**
  * @exports
  * @class AuthValidation

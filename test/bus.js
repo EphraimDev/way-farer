@@ -7,55 +7,53 @@ import app from '../server/app';
 chai.should();
 
 chai.use(chaiHttp);
-let token = '';
+let token = 'bearer ';
 const notToken = 'bearer shdbfkfk';
-let notAdmin = '';
+let notAdmin = 'bearer ';
 
 describe('Buses', () => {
-  describe('Get tokens', () => {
-    it('should add a user', (done) => {
+  describe('POST /api/v1/bus', () => {
+    it('should sign in a non-admin', (done) => {
       chai.request(app)
-        .post('/api/v1/auth/login')
+        .post('/api/v1/auth/signin')
         .send({
           email: 'non@test.co',
           password: 'Password1!',
         })
         .then((res) => {
           const { body } = res;
-          notAdmin = body.data.token;
+          notAdmin += body.data.token;
           done();
         });
     });
 
-    it('should log in a user', (done) => {
+    it('should sign in an admin', (done) => {
       chai.request(app)
-        .post('/api/v1/auth/login')
+        .post('/api/v1/auth/signin')
         .send({
           email: 'test@test.co',
           password: 'Password1!',
         })
         .then((res) => {
           const { body } = res;
-          token = body.data.token;
+          token += body.data.token;
 
           done();
         });
     });
-  });
 
-  describe('POST /api/v1/bus', () => {
     it('should add a bus', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', token)
+        .set('authorization', token)
         .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
         .field('capacity', '5')
-        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
+          console.log(body.error)
           expect(res.status).to.equal(201);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('data');
@@ -68,7 +66,7 @@ describe('Buses', () => {
     it('should check for bus that already exists', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', token)
+        .set('authorization', token)
         .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
@@ -89,7 +87,7 @@ describe('Buses', () => {
     it('should check for invalid token', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', notToken)
+        .set('authorization', notToken)
         .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
@@ -110,7 +108,7 @@ describe('Buses', () => {
     it('should check admin access', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', notAdmin)
+        .set('authorization', notAdmin)
         .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
@@ -128,11 +126,10 @@ describe('Buses', () => {
         });
     });
 
-    it('should check for wrong number plate format', (done) => {
+    it('should check for missing plate number', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', token)
-        .field('number_plate', '')
+        .set('authorization', token)
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
@@ -147,12 +144,11 @@ describe('Buses', () => {
         });
     });
 
-    it('should check for wrong manufacturer format', (done) => {
+    it('should check for missing manufacturer', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', token)
+        .set('authorization', token)
         .field('number_plate', 'test@test.co')
-        .field('manufacturer', '')
         .field('model', 'Farer')
         .field('year', '1234')
         .field('capacity', '5')
@@ -167,13 +163,12 @@ describe('Buses', () => {
         });
     });
 
-    it('should check for wrong model format', (done) => {
+    it('should check for missing model', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', token)
+        .set('authorization', token)
         .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
-        .field('model', '')
         .field('year', '1234')
         .field('capacity', '5')
         .attach('image', './test/files/pic.jpg', 'pic.jpg')
@@ -186,31 +181,14 @@ describe('Buses', () => {
           done();
         });
     });
-
-    it('should check for wrong image format', (done) => {
-      chai.request(app)
-        .post('/api/v1/bus')
-        .set('token', token)
-        .field('number_plate', 'test@test.co')
-        .field('manufacturer', 'Way')
-        .field('model', 'Farer')
-        .field('year', '1234')
-        .field('capacity', '5')
-        .attach('image', './test/files/non-pic.pdf', 'non-pic.pdf')
-        .then((res) => {
-          expect(res.status).to.equal(500);
-          done();
-        });
-    });
     
-    it('should check for wrong year', (done) => {
+    it('should check for missing year', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', token)
+        .set('authorization', token)
         .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
-        .field('year', 'ed')
         .field('capacity', '5')
         .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
@@ -218,47 +196,26 @@ describe('Buses', () => {
           expect(res.status).to.equal(400);
           expect(body).to.contain.property('error');
           expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Year must be a number');
+          expect(body.error).to.equal('Year of bus is missing');
           done();
         });
     });
 
-    it('should check for wrong year format', (done) => {
+    it('should check for missing capacity', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
-        .set('token', token)
-        .field('number_plate', 'test@test.co')
-        .field('manufacturer', 'Way')
-        .field('model', 'Farer')
-        .field('year', '123')
-        .field('capacity', '5')
-        .attach('image', './test/files/pic.jpg', 'pic.jpg')
-        .then((res) => {
-          const { body } = res;
-          expect(res.status).to.equal(400);
-          expect(body).to.contain.property('error');
-          expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Year must take the format yyyy');
-          done();
-        });
-    });
-
-    it('should check for wrong capacity format', (done) => {
-      chai.request(app)
-        .post('/api/v1/bus')
-        .set('token', token)
+        .set('authorization', token)
         .field('number_plate', 'test@test.co')
         .field('manufacturer', 'Way')
         .field('model', 'Farer')
         .field('year', '1234')
-        .field('capacity', 'w')
         .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
           expect(res.status).to.equal(400);
           expect(body).to.contain.property('error');
           expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Enter a valid bus capacity greater than 0');
+          expect(body.error).to.equal('Bus capacity is missing');
           done();
         });
     });
@@ -268,7 +225,7 @@ describe('Buses', () => {
   //     it('should update a bus data',  (done) => {
   //         chai.request(app)
   //         .put(`/api/v1/bus/update/${busId}`)
-  //         .set('token', token)
+  //         .set('authorization', token)
   //         .send({
   //             capacity:8
   //         })
@@ -287,7 +244,7 @@ describe('Buses', () => {
   //     it('should check for bus that does not exist', (done) => {
   //         chai.request(app)
   //         .put(`/api/v1/bus/update/${busId}`)
-  //         .set('token', token)
+  //         .set('authorization', token)
   //         .send({
   //             capacity: 5
   //         })
@@ -308,7 +265,7 @@ describe('Buses', () => {
   //     it('should return all buses',  (done) => {
   //         chai.request(app)
   //         .get('/api/v1/bus/all')
-  //         .set('token', token)
+  //         .set('authorization', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(201);
@@ -325,7 +282,7 @@ describe('Buses', () => {
   //     it('should return the data of selected bus',  (done) => {
   //         chai.request(app)
   //         .get(`/api/v1/bus/single/${busId}`)
-  //         .set('token', token)
+  //         .set('authorization', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(201);
@@ -340,7 +297,7 @@ describe('Buses', () => {
   //     it('should return error for bus that does exist',  (done) => {
   //         chai.request(app)
   //         .get(`/api/v1/bus/single/none`)
-  //         .set('token', token)
+  //         .set('authorization', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(404);
@@ -358,7 +315,7 @@ describe('Buses', () => {
   //     it('should remove the selected bus from the database',  (done) => {
   //         chai.request(app)
   //         .delete(`/api/v1/bus/delete/${busId}`)
-  //         .set('token', token)
+  //         .set('authorization', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(200);
@@ -371,7 +328,7 @@ describe('Buses', () => {
   //     it('should return error for bus that does exist',  (done) => {
   //         chai.request(app)
   //         .get(`/api/v1/bus/delete/none`)
-  //         .set('token', token)
+  //         .set('authorization', token)
   //         .then((res) => {
   //             const body = res.body;
   //             expect(res.status).to.equal(404);

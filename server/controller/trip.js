@@ -25,7 +25,6 @@ class TripController {
     const findBus = await pool.query(queryHelper.getBusById, [bus_id]);
 
     if (findBus.rowCount < 1) {
-      console.log("post /trips", "404")
       return jsonResponse.error(res, 'error', 404, 'Selected bus does not exist');
     }
 
@@ -59,7 +58,6 @@ class TripController {
 
     const findTrip = await pool.query(queryHelper.getTripById, [trip_id]);
     if (findTrip.rowCount < 1) {
-      console.log("delete /trips", "404")
       return jsonResponse.error(res, 'error', 404, 'Trip does not exist');
     }
 
@@ -67,7 +65,6 @@ class TripController {
     const trip_date = new Date(findTrip.rows[0].trip_date).getTime();
 
     if (trip_date <= todaydate || findTrip.rows[0] === 'Ended') {
-      console.log("delete /trips", "400")
       return jsonResponse.error(res, 'error', 400, 'Trip cannot be cancelled');
     }
 
@@ -87,10 +84,9 @@ class TripController {
   static async getAllTrips(req, res) {
     const trips = await pool.query(queryHelper.allTrips, []);
 
-    if (trips.rowCount <= 0) {
-      console.log("get /trips", "404")
-      return jsonResponse.error(res, 'error', 404, 'There are no trips');
-    }
+    // if (trips.rowCount <= 0) {
+    //   return jsonResponse.error(res, 'error', 404, 'There are no trips');
+    // }
 
     return jsonResponse.success(res, 'success', 200, trips.rows);
   }

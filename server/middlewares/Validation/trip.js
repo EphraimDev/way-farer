@@ -53,15 +53,12 @@ class TripValidation {
 
   static datetime(req, res, next) {
     const {
-      trip_date, trip_time,
+      trip_date
     } = req.body;
 
     if (!trip_date) {
       return res.status(400).send({ error: 'Trip date is required' });
     }
-    // if (typeof trip_time !== 'string' || trip_time.toString().trim() === '') {
-    //   return res.status(400).send({ error: 'Trip time is a string in format hh:mm:ss' });
-    // }
 
     return next();
   }

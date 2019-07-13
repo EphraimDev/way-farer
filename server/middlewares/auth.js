@@ -63,7 +63,7 @@ class Authorization {
       if (req.user === undefined) {
         return jsonResponse.error(res, 'error', 401, 'Token is invalid');
       }
-
+      
       return next();
     } catch (err) {
       return jsonResponse.error(res, 'error', 401, 'Token is invalid or not provided');

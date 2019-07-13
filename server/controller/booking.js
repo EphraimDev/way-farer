@@ -193,9 +193,9 @@ class BookingController {
 
     const bookings = await pool.query(queryHelper.adminBooking, []);
 
-    if (bookings.rowCount <= 0 || bookings.length <= 0) {
-      return jsonResponse.error(res, 'error', 404, 'There are no bookings');
-    }
+    // if (bookings.rowCount <= 0 || bookings.length <= 0) {
+    //   return jsonResponse.error(res, 'error', 404, 'There are no bookings');
+    // }
 
     return jsonResponse.success(res, 'success', 200, bookings.rows);
   }

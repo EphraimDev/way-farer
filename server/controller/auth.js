@@ -29,7 +29,7 @@ class AuthController {
       return jsonResponse.error(res, 'error', 409, 'User exists already');
     }
 
-    const admin = is_admin === true? is_admin: false;
+    const admin = is_admin === 'true'? true: false;
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
     const img = '';
@@ -108,8 +108,8 @@ class AuthController {
     if (findUser.rowCount < 1) {
       return jsonResponse.error(res, 'error', 404, 'User does not exist');
     }
-
-    if (user_id !== req.user.user_id) {
+    
+    if (Number(user_id) !== req.user.user_id) {
       return jsonResponse.error(res, 'error', 401, 'User not authorized');
     }
 
@@ -153,7 +153,6 @@ class AuthController {
   }
 
   static async allUsers(req, res){
-    console.log('all')
     const users = await pool.query(queryHelper.allUsers, []);
 
     return jsonResponse.success(res, 'success', 200, users.rows);
