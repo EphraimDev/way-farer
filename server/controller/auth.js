@@ -46,11 +46,10 @@ class AuthController {
     Mailer.createAccountMessage(email);
 
     const data = {
-      token,
       ...newUser.rows[0],
     };
 
-    return jsonResponse.success(res, 'success', 201, data);
+    return jsonResponse.success(res, 'success', 201, token, data);
   }
 
   /**
@@ -76,11 +75,10 @@ class AuthController {
       const token = await Authorization.generateToken(findUser.rows[0]);
 
       const data = {
-        token,
         ...findUser.rows[0],
       };
 
-      return jsonResponse.success(res, 'success', 200, data);
+      return jsonResponse.auth(res, 'success', 200, token, data);
     }
 
     return jsonResponse.error(res, 'error', 401, 'Email or password incorrect');
