@@ -25,14 +25,15 @@ class TripController {
     const findBus = await pool.query(queryHelper.getBusById, [bus_id]);
 
     if (findBus.rowCount < 1) {
+      console.log("post /trips", "404")
       return jsonResponse.error(res, 'error', 404, 'Selected bus does not exist');
     }
 
-    const findActiveBus = await pool.query(queryHelper.getActiveBus, [bus_id, 'Active']);
+    // const findActiveBus = await pool.query(queryHelper.getActiveBus, [bus_id, 'Active']);
 
-    if (findActiveBus.rowCount >= 1) {
-      return jsonResponse.error(res, 'error', 409, 'A trip with this bus is active');
-    }
+    // if (findActiveBus.rowCount >= 1) {
+    //   return jsonResponse.error(res, 'error', 409, 'A trip with this bus is active');
+    // }
 
     let tripTime = trip_time;
     if (!trip_time) {
@@ -41,7 +42,7 @@ class TripController {
     }
     const newTrip = await pool.query(queryHelper.addTrip,
       [req.user.user_id, bus_id, origin.toLowerCase(), destination.toLowerCase(), trip_date, tripTime, fare, 'Active', moment.createdAt]);
-      
+
     return jsonResponse.success(res, 'success', 201, newTrip.rows[0]);
   }
 
@@ -58,6 +59,7 @@ class TripController {
 
     const findTrip = await pool.query(queryHelper.getTripById, [trip_id]);
     if (findTrip.rowCount < 1) {
+      console.log("delete /trips", "404")
       return jsonResponse.error(res, 'error', 404, 'Trip does not exist');
     }
 
@@ -65,6 +67,7 @@ class TripController {
     const trip_date = new Date(findTrip.rows[0].trip_date).getTime();
 
     if (trip_date <= todaydate || findTrip.rows[0] === 'Ended') {
+      console.log("delete /trips", "400")
       return jsonResponse.error(res, 'error', 400, 'Trip cannot be cancelled');
     }
 
@@ -85,7 +88,8 @@ class TripController {
     const trips = await pool.query(queryHelper.allTrips, []);
 
     if (trips.rowCount <= 0) {
-      return jsonResponse.success(res, 'success', 200, 'There are no trips');
+      console.log("get /trips", "404")
+      return jsonResponse.error(res, 'error', 404, 'There are no trips');
     }
 
     return jsonResponse.success(res, 'success', 200, trips.rows);

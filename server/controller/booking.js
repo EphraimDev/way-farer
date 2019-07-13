@@ -26,6 +26,7 @@ class BookingController {
     const findTrip = await BookingController.findTrip(trip_id, res);
 
     if (findTrip === false) {
+      console.log("post /bookings", "404")
       return jsonResponse.error(res, 'error', 404, 'This trip does not exist');
     }
 
@@ -38,6 +39,7 @@ class BookingController {
     const booked = await pool.query(queryHelper.allTripBooking, [trip_id]);
 
     if (findBus.capacity <= booked.rowCount || status === 'Cancelled' || status === 'Ended' || tripDate <= todaydate) {
+      console.log("post /bookings", "4001")
       return jsonResponse.error(res, 'error', 400, 'Select another trip');
     }
 
@@ -45,6 +47,7 @@ class BookingController {
       const checkSeat = await BookingController.checkSeat(booked.rows, seat);
 
       if (checkSeat !== undefined) {
+        console.log("post /bookings", "400")
         return jsonResponse.error(res, 'error', 400, 'Seat number is not available');
       }
     }
@@ -184,15 +187,19 @@ class BookingController {
   static async getAllBookings(req, res) {
     const { user_id, is_admin } = req.user;
 
-    let bookings = [];
+    //let bookings = [];
 
-    if (is_admin === true) {
-      bookings = await pool.query(queryHelper.adminBooking, []);
-    } else {
-      bookings = await pool.query(queryHelper.userBooking, [user_id]);
-    }
+    // if (is_admin === true) {
+    //   bookings = await pool.query(queryHelper.adminBooking, []);
+    // } else {
+    //   bookings = await pool.query(queryHelper.userBooking, [user_id]);
+    // }
+
+    console.log(req.user);
+    const bookings = await pool.query(queryHelper.adminBooking, []);
 
     if (bookings.rowCount <= 0 || bookings.length <= 0) {
+      console.log("GET /bookings", "404")
       return jsonResponse.error(res, 'error', 404, 'There are no bookings');
     }
 
@@ -214,6 +221,7 @@ class BookingController {
     const bookingDetails = await pool.query(queryHelper.matchBooking, [user_id, booking_id]);
 
     if (bookingDetails.rowCount === 0) {
+      console.log("delete /bookings", "404")
       return jsonResponse.error(res, 'error', 404, 'Booking does not belong to user');
     }
 
@@ -226,6 +234,7 @@ class BookingController {
     const tripStart = new Date(`${trip_date.toLocaleDateString()} ${trip_time}`);
 
     if (tripStart <= new Date()) {
+      console.log("DELETE /bookings", "400")
       return jsonResponse.error(res, 'error', 400, 'This booking cannot be deleted');
     }
 
