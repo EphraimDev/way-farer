@@ -59,7 +59,7 @@ class Authorization {
       const foundUser = await pool.query(query.text, [decoded.email]);
 
       [req.user] = foundUser.rows;
-      console.log(req.user)
+      
       if (req.user === undefined) {
         return jsonResponse.error(res, 'error', 401, 'Token is invalid');
       }

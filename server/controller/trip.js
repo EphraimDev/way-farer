@@ -21,7 +21,8 @@ class TripController {
     const {
       bus_id, origin, destination, trip_date, trip_time, fare,
     } = req.body;
-
+    console.log(req.user)
+    console.log(req.body)
     const trip_id = guid.formGuid();
 
     const findBus = await pool.query(queryHelper.getBusById, [bus_id]);
