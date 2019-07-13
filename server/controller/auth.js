@@ -61,7 +61,7 @@ class AuthController {
    */
   static async login(req, res) {
     const { email, password } = req.body;
-    console.log(email, password)
+    
     const findUser = await pool.query(queryHelper.text, [email.toLowerCase()]);
 
     if (findUser.rowCount < 1) {
