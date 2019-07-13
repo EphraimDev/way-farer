@@ -6,16 +6,16 @@ import {updateStatus} from '../middlewares/Validation/status';
 
 const router = express.Router();
 
-// router.post('/', authorization.authorize, authorization.checkAdmin, validate.places, validate.money, validate.datetime, validate.bus, trips.addTrip);
-// router.delete('/:trip_id', authorization.authorize, authorization.checkAdmin, trips.cancelTrip);
-// router.get('/', authorization.authorize, trips.getAllTrips);
-// router.get('/search?', authorization.authorize, trips.searchTrips);
-// router.patch('/:trip_id', authorization.authorize, authorization.checkAdmin, updateStatus, trips.updateTrip);
-
-router.post('/', authorization.authorize, authorization.checkAdmin, trips.addTrip);
+router.post('/', authorization.authorize, authorization.checkAdmin, validate.places, validate.money, validate.datetime, validate.bus, trips.addTrip);
 router.delete('/:trip_id', authorization.authorize, authorization.checkAdmin, trips.cancelTrip);
-router.get('/', authorization.authorize, trips.getAllTrips); 
+router.get('/', authorization.authorize, trips.getAllTrips);
 router.get('/search?', authorization.authorize, trips.searchTrips);
-router.patch('/:trip_id', authorization.authorize, authorization.checkAdmin, trips.updateTrip);
+router.patch('/:trip_id', authorization.authorize, authorization.checkAdmin, updateStatus, trips.updateTrip);
+
+// router.post('/', authorization.authorize, authorization.checkAdmin, trips.addTrip);
+// router.delete('/:trip_id', authorization.authorize, authorization.checkAdmin, trips.cancelTrip);
+// router.get('/', authorization.authorize, trips.getAllTrips); 
+// router.get('/search?', authorization.authorize, trips.searchTrips);
+// router.patch('/:trip_id', authorization.authorize, authorization.checkAdmin, trips.updateTrip);
 
 export default router;

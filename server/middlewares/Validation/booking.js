@@ -16,8 +16,8 @@ class BookingValidation {
     const {
       trip_id, seat,
     } = req.body;
-    if (!trip_id || trip_id.length < 1 || typeof trip_id !== 'string') {
-      return res.status(400).json({ error: 'Trip ID is a string' });
+    if (!trip_id) {
+      return res.status(400).json({ error: 'Trip ID is required' });
     }
     if (seat && typeof seat !== 'number') {
       return res.status(400).json({ error: 'Seat is a number' });

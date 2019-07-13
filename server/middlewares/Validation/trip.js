@@ -17,8 +17,8 @@ class TripValidation {
       bus_id,
     } = req.body;
 
-    if (bus_id.length < 1 || typeof bus_id !== 'string') {
-      return res.status(400).json({ error: 'Bus ID is a string' });
+    if (!bus_id) {
+      return res.status(400).json({ error: 'Bus ID is required' });
     }
 
     return next();
@@ -29,11 +29,11 @@ class TripValidation {
       origin, destination,
     } = req.body;
 
-    if (typeof origin !== 'string' || origin.toString().trim() === '') {
-      return res.status(400).send({ error: 'Origin is a string' });
+    if (!origin) {
+      return res.status(400).send({ error: 'Origin is required' });
     }
-    if (typeof destination !== 'string' || destination.toString().trim() === '') {
-      return res.status(400).send({ error: 'Destination is a string' });
+    if (!destination) {
+      return res.status(400).send({ error: 'Destination is required' });
     }
 
     return next();
@@ -44,8 +44,8 @@ class TripValidation {
       fare,
     } = req.body;
 
-    if (typeof fare !== 'number') {
-      return res.status(400).send({ error: 'Fare must be a number' });
+    if (!fare) {
+      return res.status(400).send({ error: 'Fare is required' });
     }
 
     return next();
@@ -56,8 +56,8 @@ class TripValidation {
       trip_date, trip_time,
     } = req.body;
 
-    if (typeof trip_date !== 'string' || trip_date.toString().trim() === '') {
-      return res.status(400).send({ error: 'Trip date is a string in format yyyy-mm-dd' });
+    if (!trip_date) {
+      return res.status(400).send({ error: 'Trip date is required' });
     }
     // if (typeof trip_time !== 'string' || trip_time.toString().trim() === '') {
     //   return res.status(400).send({ error: 'Trip time is a string in format hh:mm:ss' });
