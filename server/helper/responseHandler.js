@@ -19,21 +19,7 @@ class JSONResponse {
   }
 
   /**
-   * @method auth
-   * @memberof JSONResponse
-   * @param {object} user
-   */
-  static async auth(res, status, code, token, data) {
-    res.status(code);
-    res.json({
-      status,
-      token,
-      data,
-    });
-  }
-
-  /**
-   * @method error
+   * @method success
    * @memberof JSONResponse
    * @param {object} user
    */
