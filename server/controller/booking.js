@@ -203,6 +203,30 @@ class BookingController {
       return jsonResponse.error(res, 'error', 404, 'There are no bookings');
     }
 
+  //   let combined = [];
+  //  await bookings.rows.forEach(async(booking, i) => {
+  //     const user = await pool.query(queryHelper.userId, [booking.user_id]);
+  //     const trip = await pool.query(queryHelper.getTrip, [booking.trip_id]);
+      
+  //     const data = {
+  //       booking_id: booking.booking_id,
+  //       user_id: booking.user_id,
+  //       trip_id: booking.trip_id,
+  //       seat_number: booking.seat_number,
+  //       first_name: user.rows[0].first_name,
+  //       last_name: user.rows[0].last_name,
+  //       email: user.rows[0].email,
+  //       bus_id: trip.rows[0].bus_id,
+  //       trip_date: trip.rows[0].trip_date,
+  //       trip_time: trip.rows[0].trip_time,
+  //       origin: trip.rows[0].origin,
+  //       destination: trip.rows[0].destination,
+  //       fare: trip.rows[0].fare
+  //     }
+  //     console.log(data)
+  //     combined.push(data);
+  //   })
+  //   console.log(combined)
     return jsonResponse.success(res, 'success', 200, bookings.rows);
   }
 

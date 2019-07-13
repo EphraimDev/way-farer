@@ -17,7 +17,7 @@ const query = {
   bookTrip: 'INSERT INTO booking(user_id, trip_id, seat_number, created_at) values($1,$2,$3,$4) RETURNING booking_id, user_id, trip_id, seat_number',
   getBooking: 'SELECT * FROM booking WHERE booking_id = $1',
   allTripBooking: 'SELECT * FROM booking WHERE trip_id = $1',
-  adminBooking: 'SELECT * FROM booking',
+  adminBooking: 'SELECT booking.booking_id, booking.trip_id, booking.user_id, booking.seat_number, users.first_name, users.last_name, users.email, trip.trip_date, trip.origin, trip.destination, trip.fare FROM booking INNER JOIN users ON booking.user_id = users.user_id INNER JOIN trip ON booking.trip_id = trip.trip_id',
   userBooking: 'SELECT * FROM booking WHERE user_id = $1',
   matchBooking: 'SELECT * FROM booking WHERE user_id = $1 AND booking_id = $2',
   deleteBooking: 'DELETE FROM booking WHERE booking_id = $1',
