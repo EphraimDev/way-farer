@@ -7,7 +7,7 @@ import app from '../server/app';
 chai.should();
 
 chai.use(chaiHttp);
-let token = "bearer ";
+let token = "";
 let userId = "";
 let anotherId = "";
 
@@ -17,10 +17,10 @@ describe('Users Authentication', () => {
             chai.request(app)
             .post('/api/v1/auth/signup')
             .field('email', 'test@test.co')
-            .field('firstname', 'Way')
-            .field('lastname', 'Farer')
+            .field('first_name', 'Way')
+            .field('last_name', 'Farer')
             .field('password', 'Password1!')
-            .field('isAdmin', 'true')
+            .field('is_admin', 'true')
             .attach('image', './test/files/pic.jpg', 'pic.jpg')
             .then((res) => {
                 const body = res.body;
@@ -39,8 +39,8 @@ describe('Users Authentication', () => {
               .post('/api/v1/auth/signup')
               .send({
                 email: 'non@test.co',
-                firstname: 'Way',
-                lastname: 'Farer',
+                first_name: 'Way',
+                last_name: 'Farer',
                 password: 'Password1!',
               })
               .then((res) => {
@@ -61,10 +61,10 @@ describe('Users Authentication', () => {
             .post('/api/v1/auth/signup')
             .send({
                 email: "test@test.co",
-                firstname: "Way",
-                lastname: "Farer",
+                first_name: "Way",
+                last_name: "Farer",
                 password: "Password1!",
-                isAdmin: true
+                is_admin: true
             })
             .then((res) => {
                 const body = res.body;
@@ -83,10 +83,10 @@ describe('Users Authentication', () => {
             .post('/api/v1/auth/signup')
             .send({
                 email: "test",
-                firstname: "Way",
-                lastname: "Farer",
+                first_name: "Way",
+                last_name: "Farer",
                 password: "Password1!",
-                isAdmin: true
+                is_admin: true
             })
             .then((res) => {
                 const body = res.body;
@@ -103,10 +103,10 @@ describe('Users Authentication', () => {
             .post('/api/v1/auth/signup')
             .send({
                 email: "test@test.co",
-                firstname: 123,
-                lastname: "Farer",
+                first_name: 123,
+                last_name: "Farer",
                 password: "Password1!",
-                isAdmin: true
+                is_admin: true
             })
             .then((res) => {
                 const body = res.body;
@@ -123,10 +123,10 @@ describe('Users Authentication', () => {
             .post('/api/v1/auth/signup')
             .send({
                 email: "test@test.co",
-                firstname: "Abe",
-                lastname: 123,
+                first_name: "Abe",
+                last_name: 123,
                 password: "Password1!",
-                isAdmin: true
+                is_admin: true
             })
             .then((res) => {
                 const body = res.body;
@@ -143,10 +143,10 @@ describe('Users Authentication', () => {
             .post('/api/v1/auth/signup')
             .send({
                 email: "test@test.co",
-                firstname: "Abe",
-                lastname: "Farer",
+                first_name: "Abe",
+                last_name: "Farer",
                 password: "Passwor",
-                isAdmin: true
+                is_admin: true
             })
             .then((res) => {
                 const body = res.body;
@@ -162,10 +162,10 @@ describe('Users Authentication', () => {
             chai.request(app)
             .post('/api/v1/auth/signup')
             .field('email', 'tester@test.co')
-            .field('firstname', 'Way')
-            .field('lastname', 'Farer')
+            .field('first_name', 'Way')
+            .field('last_name', 'Farer')
             .field('password', 'Password1!')
-            .field('isAdmin', 'true')
+            .field('is_admin', 'true')
             .attach('image', './test/files/non-pic.pdf', 'non-pic.pdf')
             .then((res) => {
                 expect(res.status).to.equal(500);
@@ -239,11 +239,9 @@ describe('Users Authentication', () => {
         it('should update a user profile',  (done) => {
             chai.request(app)
             .patch(`/api/v1/auth/${userId}`)
-            .set('authorization', token)
-            .send({
-                firstname: "Way",
-                lastname: "Fare"
-            })
+            .set('token', token)
+            .field('first_name', 'Way')
+            .field('last_name', 'Fare')
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(200);
@@ -258,11 +256,9 @@ describe('Users Authentication', () => {
         it('should check if user is authorized',  (done) => {
             chai.request(app)
             .patch(`/api/v1/auth/${anotherId}`)
-            .set('authorization', token)
-            .send({
-                firstname: "Way",
-                lastname: "Fare"
-            })
+            .set('token', token)
+            .field('first_name', 'Way')
+            .field('last_name', 'Fare')
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(401);
@@ -278,11 +274,9 @@ describe('Users Authentication', () => {
         it('should check if user exists',  (done) => {
             chai.request(app)
             .patch(`/api/v1/auth/abcd`)
-            .set('authorization', token)
-            .send({
-                firstname: "Way",
-                lastname: "Fare"
-            })
+            .set('token', token)
+            .field('first_name', 'Way')
+            .field('last_name', 'Fare')
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(404);
@@ -300,7 +294,7 @@ describe('Users Authentication', () => {
     //     it('should return profile of the selected user',  (done) => {
     //         chai.request(app)
     //         .get(`/api/v1/auth/profile/${userId}`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(201);
@@ -315,7 +309,7 @@ describe('Users Authentication', () => {
     //     it('should check for user that do not exist ',  (done) => {
     //         chai.request(app)
     //         .get(`/api/v1/auth/profile/none`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(404);
@@ -333,7 +327,7 @@ describe('Users Authentication', () => {
     //     it('should return profile of the selected user',  (done) => {
     //         chai.request(app)
     //         .get(`/api/v1/auth/profile/${userId}`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(201);
@@ -348,7 +342,7 @@ describe('Users Authentication', () => {
     //     it('should check for user that do not exist ',  (done) => {
     //         chai.request(app)
     //         .get(`/api/v1/auth/profile/none`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(404);
@@ -366,7 +360,7 @@ describe('Users Authentication', () => {
     //     it('should return the profile of the all users',  (done) => {
     //         chai.request(app)
     //         .get(`/api/v1/auth/admin/all-users`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(200);
@@ -381,7 +375,7 @@ describe('Users Authentication', () => {
     //     it('should check for admin status of user',  (done) => {
     //         chai.request(app)
     //         .get(`/api/v1/auth/admin/all-users`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(401);
@@ -399,7 +393,7 @@ describe('Users Authentication', () => {
     //     it('should delete the user from the database',  (done) => {
     //         chai.request(app)
     //         .delete(`/api/v1/auth/delete/${userId}`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(200);
@@ -412,7 +406,7 @@ describe('Users Authentication', () => {
     //     it('should check for admin status of user',  (done) => {
     //         chai.request(app)
     //         .get(`/api/v1/auth/delete/none`)
-    //         .set('Authorization', token)
+    //         .set('token', token)
     //         .then((res) => {
     //             const body = res.body;
     //             expect(res.status).to.equal(404);

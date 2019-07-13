@@ -14,9 +14,9 @@ class BookingValidation {
               */
   static book(req, res, next) {
     const {
-      tripId, seat,
+      trip_id, seat,
     } = req.body;
-    if (tripId.length < 1 || typeof tripId !== 'string') {
+    if (!trip_id || trip_id.length < 1 || typeof trip_id !== 'string') {
       return res.status(400).json({ error: 'Trip ID is a string' });
     }
     if (seat && typeof seat !== 'number') {

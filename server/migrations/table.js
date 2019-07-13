@@ -5,7 +5,9 @@ pool.on('connect', () => {
   console.log('Connected to the database');
 });
 
-const queryText = `CREATE TYPE action AS ENUM
+const queryText = `DROP TABLE IF EXISTS booking trip bus users CASCADE;
+
+  CREATE TYPE action AS ENUM
   ('Active', 'Cancelled', 'Ended');
   
   CREATE TABLE users

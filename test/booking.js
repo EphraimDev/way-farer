@@ -7,11 +7,11 @@ import app from '../server/app';
 chai.should();
 
 chai.use(chaiHttp);
-let token = 'bearer ';
-let notAdmin = 'bearer ';
-let tripId;
-let busId;
-let bookingId;
+let token = '';
+let notAdmin = '';
+let trip_id;
+let bus_id;
+let booking_id;
 
 describe('Bookings', () => {
     describe('Get tokens', () => {
@@ -24,7 +24,7 @@ describe('Bookings', () => {
             })
             .then((res) => {
               const { body } = res;
-              token += body.data.token;
+              token = body.data.token;
     
               done();
             });
@@ -39,7 +39,7 @@ describe('Bookings', () => {
             })
             .then((res) => {
               const { body } = res;
-              notAdmin += body.data.token;
+              notAdmin = body.data.token;
               done();
             });
         });
@@ -49,9 +49,9 @@ describe('Bookings', () => {
       it('should check for trip ID format', (done) => {
         chai.request(app)
           .post('/api/v1/bookings')
-          .set('authorization', token)
+          .set('token', token)
           .send({
-            tripId: 1
+            trip_id: 1
           })
           .then((res) => {
             const { body } = res;
@@ -66,9 +66,9 @@ describe('Bookings', () => {
       it('should check for seat format', (done) => {
         chai.request(app)
           .post('/api/v1/bookings')
-          .set('authorization', token)
+          .set('token', token)
           .send({
-            tripId: "3",
+            trip_id: "3",
             seat: "23"
           })
           .then((res) => {
@@ -83,9 +83,9 @@ describe('Bookings', () => {
         it('should add a bus', (done) => {
             chai.request(app)
               .post('/api/v1/bus')
-              .set('authorization', token)
+              .set('token', token)
               .send({
-                numberPlate: 'ABC123DEQ',
+                number_plate: 'ABC123DEQ',
                 manufacturer: 'Toyota',
                 model: 'Siena',
                 year: 2008,
@@ -93,7 +93,7 @@ describe('Bookings', () => {
               })
               .then((res) => {
                 const { body } = res;
-                busId = body.data.bus_id;
+                bus_id = body.data.bus_id;
                 done();
               });
           });
@@ -101,18 +101,18 @@ describe('Bookings', () => {
         it('should create a trip', (done) => {
             chai.request(app)
               .post('/api/v1/trips')
-              .set('authorization', token)
+              .set('token', token)
               .send({
-                busId: busId,
+                bus_id: bus_id,
                 origin: 'Ikeja',
                 destination: 'CMS',
-                tripDate: '2020-02-01',
-                tripTime: '4:21:38 AM',
+                trip_date: '2020-02-01',
+                trip_time: '4:21:38 AM',
                 fare: 500.00,
               })
               .then((res) => {
                 const { body } = res;
-                tripId = body.data.trip_id;
+                trip_id = body.data.trip_id;
                 done();
               });
           });
@@ -120,9 +120,9 @@ describe('Bookings', () => {
           it('should check for trip that does not exist', (done) => {
             chai.request(app)
             .post('/api/v1/bookings')
-            .set('authorization', token)
+            .set('token', token)
             .send({
-                tripId: '5',
+                trip_id: '5',
             })
             .then((res) => {
                 const body = res.body;
@@ -139,13 +139,13 @@ describe('Bookings', () => {
         it('should book a trip',  (done) => {
             chai.request(app)
             .post('/api/v1/bookings')
-            .set('authorization', token)
+            .set('token', token)
             .send({
-                tripId: tripId,
+                trip_id: trip_id,
             })
             .then((res) => {
                 const body = res.body;
-                tripId = body.data.trip_id;
+                trip_id = body.data.trip_id;
                 expect(res.status).to.equal(201);
                 expect(body).to.contain.property('status');
                 expect(body).to.contain.property('data');
@@ -157,8 +157,8 @@ describe('Bookings', () => {
 
         it('should cancel a trip', (done) => {
           chai.request(app)
-            .delete(`/api/v1/trips/${tripId}`)
-            .set('authorization', token)
+            .delete(`/api/v1/trips/${trip_id}`)
+            .set('token', token)
             .then((res) => {
               const { body } = res;
               expect(res.status).to.equal(200);
@@ -171,9 +171,9 @@ describe('Bookings', () => {
         it('should check for trip not available', (done) => {
             chai.request(app)
             .post('/api/v1/bookings')
-            .set('authorization', token)
+            .set('token', token)
             .send({
-                tripId: tripId,
+                trip_id: trip_id,
                 seat: 3
             })
             .then((res) => {
@@ -191,18 +191,18 @@ describe('Bookings', () => {
         it('should create a trip', (done) => {
           chai.request(app)
             .post('/api/v1/trips')
-            .set('authorization', token)
+            .set('token', token)
             .send({
-              busId: busId,
+              bus_id: bus_id,
               origin: 'Ikeja',
               destination: 'CMS',
-              tripDate: '2020-02-01',
-              tripTime: '4:21:38 AM',
+              trip_date: '2020-02-01',
+              trip_time: '4:21:38 AM',
               fare: 500.00,
             })
             .then((res) => {
               const { body } = res;
-              tripId = body.data.trip_id;
+              trip_id = body.data.trip_id;
               done();
             });
         });
@@ -210,15 +210,15 @@ describe('Bookings', () => {
         it('should book a trip',  (done) => {
           chai.request(app)
           .post('/api/v1/bookings')
-          .set('authorization', token)
+          .set('token', token)
           .send({
-              tripId: tripId,
+              trip_id: trip_id,
               seat: 2
           })
           .then((res) => {
               const body = res.body;
-              tripId = body.data.trip_id;
-              bookingId = body.data.booking_id;
+              trip_id = body.data.trip_id;
+              booking_id = body.data.booking_id;
               expect(res.status).to.equal(201);
               expect(body).to.contain.property('status');
               expect(body).to.contain.property('data');
@@ -231,9 +231,9 @@ describe('Bookings', () => {
         it('should check for taken seat number', (done) => {
             chai.request(app)
             .post('/api/v1/bookings')
-            .set('authorization', token)
+            .set('token', token)
             .send({
-                tripId:tripId,
+                trip_id:trip_id,
                 seat: 2
             })
             .then((res) => {
@@ -253,7 +253,7 @@ describe('Bookings', () => {
         it('should return all bookings',  (done) => {
             chai.request(app)
             .get('/api/v1/bookings')
-            .set('authorization', token)
+            .set('token', token)
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(200);
@@ -268,7 +268,7 @@ describe('Bookings', () => {
       it('should return error for no bookings',  (done) => {
         chai.request(app)
         .get('/api/v1/bookings')
-        .set('authorization', notAdmin)
+        .set('token', notAdmin)
         .then((res) => {
             const body = res.body;
             expect(res.status).to.equal(404);
@@ -281,13 +281,13 @@ describe('Bookings', () => {
     });
   });
 
-      describe('DELETE /api/v1/bookings/:bookingId', () => {
+      describe('DELETE /api/v1/bookings/:booking_id', () => {
         it('should add a bus', (done) => {
           chai.request(app)
             .post('/api/v1/bus')
-            .set('authorization', token)
+            .set('token', token)
             .send({
-              numberPlate: 'ABCs1we23DEQ',
+              number_plate: 'ABCs1we23DEQ',
               manufacturer: 'Toyota',
               model: 'Siena',
               year: 2008,
@@ -295,7 +295,7 @@ describe('Bookings', () => {
             })
             .then((res) => {
               const { body } = res;
-              busId = body.data.bus_id;
+              bus_id = body.data.bus_id;
               done();
             });
         });
@@ -303,18 +303,18 @@ describe('Bookings', () => {
       it('should create a trip', (done) => {
           chai.request(app)
             .post('/api/v1/trips')
-            .set('authorization', token)
+            .set('token', token)
             .send({
-              busId: busId,
+              bus_id: bus_id,
               origin: 'Ikeja',
               destination: 'CMS',
-              tripDate: '2030-02-01',
-              tripTime: '4:21:38 AM',
+              trip_date: '2030-02-01',
+              trip_time: '4:21:38 AM',
               fare: 500.00,
             })
             .then((res) => {
               const { body } = res;
-              tripId = body.data.trip_id;
+              trip_id = body.data.trip_id;
               done();
             });
         });
@@ -322,23 +322,22 @@ describe('Bookings', () => {
         it('should book a trip',  (done) => {
           chai.request(app)
           .post('/api/v1/bookings')
-          .set('authorization', token)
+          .set('token', token)
           .send({
-              tripId: tripId,
+              trip_id: trip_id,
               seat: 2
           })
           .then((res) => {
               const body = res.body;
-              bookingId = body.data.booking_id;
+              booking_id = body.data.booking_id;
               done()
           })
       });
 
         it('should cancel the booking',  (done) => {
-          console.log(bookingId)
             chai.request(app)
-            .delete(`/api/v1/bookings/${bookingId}`)
-            .set('authorization', token)
+            .delete(`/api/v1/bookings/${booking_id}`)
+            .set('token', token)
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(200);
@@ -350,8 +349,8 @@ describe('Bookings', () => {
 
         it("should fail for booking that don't exists", (done) => {
             chai.request(app)
-            .delete('/api/v1/bookings/bookingId')
-            .set('authorization', token)
+            .delete('/api/v1/bookings/booking_id')
+            .set('token', token)
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(404);
@@ -367,11 +366,11 @@ describe('Bookings', () => {
     });
 })
 
-//     describe('PUT /api/v1/booking/modify/:bookingId', () => {
+//     describe('PUT /api/v1/booking/modify/:booking_id', () => {
 //         it('should modify a booking',  (done) => {
 //             chai.request(app)
-//             .put(`/api/v1/booking/modify/${bookingId}`)
-//             .set('Authorization', token)
+//             .put(`/api/v1/booking/modify/${booking_id}`)
+//             .set('token', token)
 //             .send({
 //                 seat_no: 1
 //             })
@@ -390,7 +389,7 @@ describe('Bookings', () => {
 //         it("should fail for booking that don't exists", (done) => {
 //             chai.request(app)
 //             .put('/api/v1/trips/modify/none')
-//             .set('Authorization', token)
+//             .set('token', token)
 //             .send({
 //                 seat_no: 1
 //             })
@@ -409,7 +408,7 @@ describe('Bookings', () => {
 //         it('should check for trip that has been started', (done) => {
 //             chai.request(app)
 //             .put('/api/v1/trips/modify/2')
-//             .set('Authorization', token)
+//             .set('token', token)
 //             .send({
 //                 seat_no: 5
 //             })
@@ -432,7 +431,7 @@ describe('Bookings', () => {
 //         it('should get the all bookings made by the user',  (done) => {
 //             chai.request(app)
 //             .get(`/api/v1/booking/user/${userId}`)
-//             .set('Authorization', token)
+//             .set('token', token)
 //             .then((res) => {
 //                 const body = res.body;
 //                 expect(res.status).to.equal(200);
@@ -448,7 +447,7 @@ describe('Bookings', () => {
 //         it("should fail for user that don't exist", (done) => {
 //             chai.request(app)
 //             .get(`/api/v1/booking/user/none}`)
-//             .set('Authorization', token)
+//             .set('token', token)
 //             .then((res) => {
 //                 const body = res.body;
 //                 expect(res.status).to.equal(404);
@@ -464,10 +463,10 @@ describe('Bookings', () => {
 
 
 
-//     describe('GET /api/v1/booking/single/:bookingId', () => {
+//     describe('GET /api/v1/booking/single/:booking_id', () => {
 //         it('should return the booking data', (done) => {
 //             chai.request(app)
-//             .get(`/api/v1/booking/single/${bookingId}`)
+//             .get(`/api/v1/booking/single/${booking_id}`)
 //             .then((res) => {
 //                 const body = res.body;
 //                 expect(res.status).to.equal(200);

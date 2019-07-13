@@ -1,18 +1,13 @@
 import { it } from 'mocha';
 import {assert} from 'chai';
+import nodemailer from 'nodemailer';
 
 import Mailer from '../server/utils/mailer';
 import BookingController from '../server/controller/booking';
+import upload from '../server/utils/cloudinary';
 
 it('should return success', async (done) => {
     const mail = Mailer.createAccountMessage("a@a.co");
-
-    assert.equal(mail, 'success');
-    done()
-});
-
-it('should return success', async (done) => {
-    const mail = Mailer.sendMail("a@a.co", "hello", "stop");
 
     assert.equal(mail, 'success');
     done()
@@ -51,4 +46,11 @@ it('should return false', async () => {
     const trip = await BookingController.findTrip(5);
 
     assert.equal(trip, false);
+});
+
+it('should return false', async () => {
+    const req = '1562914819676pic.jpg';
+    const cloud = await upload(req);
+
+    assert.equal(cloud, false);
 });

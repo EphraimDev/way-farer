@@ -16,14 +16,14 @@ class AuthValidation {
         */
   static validateNames(req, res, next) {
     const {
-      firstname,
-      lastname,
+      first_name,
+      last_name,
     } = req.body;
 
-    if (typeof firstname !== 'string' || firstname.length < 1) {
+    if (typeof first_name !== 'string' || first_name.length < 1) {
       return res.status(400).json({ error: 'First name is required' });
     }
-    if (typeof lastname !== 'string' || lastname.length < 1) {
+    if (typeof last_name !== 'string' || last_name.length < 1) {
       return res.status(400).json({ error: 'Last name is required' });
     }
 

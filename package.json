@@ -22,8 +22,8 @@
     "build": "babel ./server --out-dir dist",
     "prod": "cross-env NODE_ENV=production npm-run-all clean build start:prod",
     "start:prod": "npm-run-all prod:create start:prod",
-    "prod:drop": "node dist/migrations/dropTable",
-    "prod:create": "node dist/migrations/createTable"
+    "prod:db": "node dist/migrations/table",
+    "test-db": "cross-env NODE_ENV=test babel-node server/migrations/table"
   },
   "repository": {
     "type": "git",
