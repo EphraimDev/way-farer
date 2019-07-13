@@ -53,12 +53,13 @@ class Authorization {
       //const token = await req.headers.token.split(' ')[1];
       const {authorization} = req.headers;
       const token = authorization.split(' ')[1];
-      console.log(token)
+      
       const decoded = await jwt.verify(token, secret);
 
       const foundUser = await pool.query(query.text, [decoded.email]);
 
       [req.user] = foundUser.rows;
+      console.log(req.user)
       if (req.user === undefined) {
         return jsonResponse.error(res, 'error', 401, 'Token is invalid');
       }
