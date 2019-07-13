@@ -61,7 +61,7 @@ class AuthController {
    */
   static async login(req, res) {
     const { email, password } = req.body;
-    
+
     const findUser = await pool.query(queryHelper.text, [email.toLowerCase()]);
 
     if (findUser.rowCount < 1) {
@@ -156,6 +156,7 @@ class AuthController {
   }
 
   static async allUsers(req, res){
+    console.log('all')
     const users = await pool.query(queryHelper.allUsers, []);
 
     return jsonResponse.success(res, 'success', 200, users.rows);
