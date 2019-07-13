@@ -87,7 +87,7 @@ class TripController {
     const trips = await pool.query(queryHelper.allTrips, []);
 
     if (trips.rowCount <= 0) {
-      return jsonResponse.error(res, 'error', 404, 'There are no trips');
+      return jsonResponse.success(res, 'success', 200, 'There are no trips');
     }
 
     return jsonResponse.success(res, 'success', 200, trips.rows);
