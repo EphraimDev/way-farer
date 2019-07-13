@@ -42,7 +42,7 @@ class TripController {
     }
     const newTrip = await pool.query(queryHelper.addTrip,
       [req.user.user_id, bus_id, origin.toLowerCase(), destination.toLowerCase(), trip_date, tripTime, fare, 'Active', moment.createdAt]);
-
+    newTrip.rows[0]['id'] = newTrip.rows[0].trip_id;
     return jsonResponse.success(res, 'success', 201, newTrip.rows[0]);
   }
 
