@@ -2,6 +2,7 @@ const query = {
   createUser: 'INSERT INTO users(user_id, email,first_name,last_name,password,img,is_admin,created_at) values($1,$2,$3,$4,$5,$6,$7,$8) RETURNING user_id, first_name, last_name, email, img, is_admin',
   updateUser: 'UPDATE users SET first_name=$1,last_name=$2,password=$3,img=$4,is_admin=$5,updated_at=$6 WHERE user_id = $7 RETURNING user_id, first_name, last_name, email, img, is_admin',
   text: 'SELECT * FROM users WHERE email = $1',
+  allUsers: 'SELECT * FROM users',
   userId: 'SELECT * FROM users WHERE user_id = $1',
   addBus: 'INSERT INTO bus(bus_id, user_id, number_plate, manufacturer, model, year, capacity, color, img, created_at) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING bus_id, number_plate, manufacturer, model, year, capacity, color, img',
   getBus: 'SELECT * FROM bus WHERE number_plate = $1',

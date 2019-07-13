@@ -61,10 +61,11 @@ class AuthController {
    */
   static async login(req, res) {
     const { email, password } = req.body;
-
+    console.log(email, password)
     const findUser = await pool.query(queryHelper.text, [email]);
 
     if (findUser.rowCount < 1) {
+      
       return jsonResponse.error(res, 'error', 404, 'User does not exist');
     }
 
@@ -152,6 +153,12 @@ class AuthController {
     return {
       firstname, lastname, admin, pass,
     };
+  }
+
+  static async allUsers(req, res){
+    const users = await pool.query(queryHelper.allUsers, []);
+
+    return jsonResponse.success(res, 'success', 200, users.rows);
   }
 }
 

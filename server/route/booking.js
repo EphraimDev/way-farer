@@ -6,7 +6,6 @@ import authorization from '../middlewares/auth';
 const router = express.Router();
 
 router.post('/', authorization.authorize, validate.book, booking.bookTrip);
-//router.post('/', authorization.authorize, booking.bookTrip);
 router.get('/', authorization.authorize, booking.getAllBookings);
 router.delete('/:booking_id', authorization.authorize, booking.deleteBooking);
 
