@@ -73,7 +73,6 @@ describe('Bookings', () => {
               })
               .then((res) => {
                 const { body } = res;
-                console.log(body.error)
                 bus_id = body.data.bus_id;
                 done();
               });
