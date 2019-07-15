@@ -11,9 +11,6 @@ const secret = config.jwtSecret;
  * @class Authorization
  */
 class Authorization {
-  constructor() {
-    this.authenticate = this.authorize;
-  }
 
   /**
    * @method generateToken
@@ -60,9 +57,9 @@ class Authorization {
 
       [req.user] = foundUser.rows;
       
-      if (req.user === undefined) {
-        return jsonResponse.error(res, 'error', 401, 'Token is invalid');
-      }
+      // if (req.user === undefined) {
+      //   return jsonResponse.error(res, 'error', 401, 'Token is invalid');
+      // }
       
       return next();
     } catch (err) {

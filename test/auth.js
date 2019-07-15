@@ -21,6 +21,7 @@ describe('Users Authentication', () => {
             .field('last_name', 'Farer')
             .field('password', 'Password1!')
             .field('is_admin', 'true')
+            .attach('image', './test/files/pic.jpg', 'pic.jpg')
             .then((res) => {
                 const body = res.body;
                 expect(res.status).to.equal(201);

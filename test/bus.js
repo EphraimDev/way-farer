@@ -42,7 +42,7 @@ describe('Buses', () => {
         });
     });
 
-    it('should add a bus', (done) => {
+    it('should add a bus with image', (done) => {
       chai.request(app)
         .post('/api/v1/bus')
         .set('authorization', token)
@@ -51,9 +51,31 @@ describe('Buses', () => {
         .field('model', 'Farer')
         .field('year', '1234')
         .field('capacity', '5')
+        .attach('image', './test/files/pic.jpg', 'pic.jpg')
         .then((res) => {
           const { body } = res;
-          console.log(body.error)
+          expect(res.status).to.equal(201);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('object');
+          done();
+        });
+    });
+
+    
+
+    it('should add a bus without image', (done) => {
+      chai.request(app)
+        .post('/api/v1/bus')
+        .set('authorization', token)
+        .field('number_plate', 'another')
+        .field('manufacturer', 'Way')
+        .field('model', 'Farer')
+        .field('year', '1234')
+        .field('capacity', '5')
+        .then((res) => {
+          const { body } = res;
           expect(res.status).to.equal(201);
           expect(body).to.contain.property('status');
           expect(body).to.contain.property('data');

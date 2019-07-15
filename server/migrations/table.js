@@ -74,11 +74,9 @@ const queryText = `DROP TABLE IF EXISTS booking, trip, bus, users CASCADE;
 pool
   .query(queryText)
   .then((res) => {
-    console.log(res);
     pool.end();
   })
   .catch((err) => {
-    console.log(err);
     pool.end();
   });
 

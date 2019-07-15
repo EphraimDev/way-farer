@@ -78,10 +78,8 @@ INSERT INTO booking
 pool
   .query(text)
   .then((res) => {
-    console.log(res);
     pool.end();
   })
   .catch((err) => {
-    console.log(err);
     pool.end();
   });

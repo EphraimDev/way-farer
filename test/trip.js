@@ -77,7 +77,7 @@ describe('Trips', () => {
         });
     });
 
-    it('should create a trip', (done) => {
+    it('should create a trip with time of trip', (done) => {
       chai.request(app)
         .post('/api/v1/trips')
         .set('authorization', token)
@@ -87,6 +87,31 @@ describe('Trips', () => {
           destination: 'CMS',
           trip_date: '10/12/2019',
           trip_time: '4:21:38 AM',
+          fare: 500.00,
+        })
+        .then((res) => {
+          const { body } = res;
+          trip_id = body.data.trip_id;
+          expect(res.status).to.equal(201);
+          expect(body).to.contain.property('status');
+          expect(body).to.contain.property('data');
+          expect(body.status).to.equal('success');
+          expect(body.data).to.be.an('object');
+          done();
+        });
+    });
+
+    
+
+    it('should create a trip without time of trip', (done) => {
+      chai.request(app)
+        .post('/api/v1/trips')
+        .set('authorization', token)
+        .send({
+          bus_id: bus_id,
+          origin: 'Ikeja',
+          destination: 'CMS',
+          trip_date: '10/12/2019',
           fare: 500.00,
         })
         .then((res) => {
@@ -510,6 +535,7 @@ describe('Trips', () => {
           trip_date: '10/12/2019',
           trip_time: '4:21:38 AM',
           fare: 500.00,
+          status: "Ended"
         })
         .then((res) => {
           const { body } = res;
