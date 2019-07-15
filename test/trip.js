@@ -318,21 +318,21 @@ describe('Trips', () => {
         });
     });
 
-    it('should check admin access', (done) => {
-      chai.request(app)
-        .delete('/api/v1/trips/1')
-        .set('authorization', notAdmin)
-        .then((res) => {
-          const { body } = res;
-          expect(res.status).to.equal(401);
-          expect(body).to.contain.property('status');
-          expect(body).to.contain.property('error');
-          expect(body.status).to.equal('error');
-          expect(body.error).to.be.a('string');
-          expect(body.error).to.equal('Admin access only');
-          done();
-        });
-    });
+    // it('should check admin access', (done) => {
+    //   chai.request(app)
+    //     .delete('/api/v1/trips/1')
+    //     .set('authorization', notAdmin)
+    //     .then((res) => {
+    //       const { body } = res;
+    //       expect(res.status).to.equal(401);
+    //       expect(body).to.contain.property('status');
+    //       expect(body).to.contain.property('error');
+    //       expect(body.status).to.equal('error');
+    //       expect(body.error).to.be.a('string');
+    //       expect(body.error).to.equal('Admin access only');
+    //       done();
+    //     });
+    // });
 
     it("should fail for trips that don't exists", (done) => {
       chai.request(app)
