@@ -4,7 +4,6 @@ import pool from '../model/db';
 import moment from '../utils/moment';
 import queryHelper from '../helper/query';
 import Mailer from '../utils/mailer';
-import GUID from '../utils/guid';
 import upload from '../utils/cloudinary';
 import jsonResponse from '../helper/responseHandler';
 
@@ -30,15 +29,13 @@ class AuthController {
       return jsonResponse.error(res, 'error', 409, 'User exists already');
     }
 
-    const admin = is_admin === 'true';
+    const admin = is_admin === 'true'? true: false;
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
     const img = '';
     const { image } = await AuthController.uploadImage(req, img);
-
-    const userId = GUID.formGuid();
     
-    const newUser = await pool.query(queryHelper.createUser, [userId, email.toLowerCase(), first_name,
+    const newUser = await pool.query(queryHelper.createUser, [email.toLowerCase(), first_name,
       last_name, hashedPassword, image, admin, moment.createdAt]);
 
     const token = await Authorization.generateToken(newUser.rows[0]);
@@ -62,9 +59,10 @@ class AuthController {
   static async login(req, res) {
     const { email, password } = req.body;
 
-    const findUser = await pool.query(queryHelper.text, [email]);
+    const findUser = await pool.query(queryHelper.text, [email.toLowerCase()]);
 
     if (findUser.rowCount < 1) {
+      
       return jsonResponse.error(res, 'error', 404, 'User does not exist');
     }
 
@@ -110,8 +108,8 @@ class AuthController {
     if (findUser.rowCount < 1) {
       return jsonResponse.error(res, 'error', 404, 'User does not exist');
     }
-
-    if (user_id !== req.user.user_id) {
+    
+    if (Number(user_id) !== req.user.user_id) {
       return jsonResponse.error(res, 'error', 401, 'User not authorized');
     }
 
@@ -131,8 +129,7 @@ class AuthController {
     let img = '';
     if (req.file) {
       await upload(req);
-      img = req.body.imageURL !== null || req.body.imageURL !== undefined ? req.body.imageURL
-        : image;
+      img = req.body.imageURL !== undefined ? req.body.imageURL : image;
     }
 
     return img;
@@ -152,6 +149,12 @@ class AuthController {
     return {
       firstname, lastname, admin, pass,
     };
+  }
+
+  static async allUsers(req, res){
+    const users = await pool.query(queryHelper.allUsers, []);
+
+    return jsonResponse.success(res, 'success', 200, users.rows);
   }
 }
 

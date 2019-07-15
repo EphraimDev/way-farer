@@ -41,7 +41,6 @@ class BookingController {
 
     if (seat && booked.rowCount > 0) {
       const checkSeat = await BookingController.checkSeat(booked.rows, seat);
-
       if (checkSeat !== undefined) {
         return jsonResponse.error(res, 'error', 400, 'Seat number is not available');
       }
@@ -50,16 +49,14 @@ class BookingController {
     let seatNumber = seat;
     if (!seat) {
       if (booked.rowCount > 0) {
-        seatNumber = BookingController.assignSeatNumber(booked.rows[0], findBus.capacity);
+        seatNumber = await BookingController.assignSeatNumber(booked.rows, findBus.capacity);
       } else {
         seatNumber = 1;
       }
     }
 
-    const book_id = guid.formGuid();
-
     const newBooking = await pool.query(queryHelper.bookTrip,
-      [book_id, req.user.user_id, trip_id, seatNumber, moment.createdAt]);
+      [req.user.user_id, trip_id, seatNumber, moment.createdAt]);
 
     const user = await await pool.query(queryHelper.userId, [req.user.user_id]);
 
@@ -75,6 +72,7 @@ class BookingController {
       origin: findTrip.origin,
       destination: findTrip.destination,
       fare: findTrip.fare,
+      id: newBooking.rows[0].booking_id
     };
 
     return jsonResponse.success(res, 'success', 201, data);
@@ -106,8 +104,8 @@ class BookingController {
       takenSeats.push(seat_number);
     });
 
-    const newSeat = BookingController.fetchSeat(capacityArr, takenSeats);
-
+    const newSeat = await BookingController.fetchSeat(capacityArr, takenSeats);
+    
     return newSeat;
   }
 
@@ -116,8 +114,8 @@ class BookingController {
    * @staticmethod
    */
   static async fetchSeat(capacity, taken) {
-    const seat = capacity.find(num => taken.includes(num) === false);
-
+    const seat = await capacity.find(num => taken.includes(num) === false);
+    
     return seat;
   }
 
@@ -184,17 +182,19 @@ class BookingController {
   static async getAllBookings(req, res) {
     const { user_id, is_admin } = req.user;
 
-    let bookings = [];
+    //let bookings = [];
 
-    if (is_admin === true) {
-      bookings = await pool.query(queryHelper.adminBooking, []);
-    } else {
-      bookings = await pool.query(queryHelper.userBooking, [user_id]);
-    }
+    // if (is_admin === true) {
+    //   bookings = await pool.query(queryHelper.adminBooking, []);
+    // } else {
+    //   bookings = await pool.query(queryHelper.userBooking, [user_id]);
+    // }
 
-    if (bookings.rowCount <= 0 || bookings.length <= 0) {
-      return jsonResponse.error(res, 'error', 404, 'There are no bookings');
-    }
+    const bookings = await pool.query(queryHelper.adminBooking, []);
+
+    // if (bookings.rowCount <= 0 || bookings.length <= 0) {
+    //   return jsonResponse.error(res, 'error', 404, 'There are no bookings');
+    // }
 
     return jsonResponse.success(res, 'success', 200, bookings.rows);
   }
@@ -229,9 +229,12 @@ class BookingController {
       return jsonResponse.error(res, 'error', 400, 'This booking cannot be deleted');
     }
 
-    await pool.query(queryHelper.deleteBooking, [booking_id]);
+    await pool.query(queryHelper.deleteBooking, ['1', moment.deletedAt, booking_id]);
 
-    return jsonResponse.success(res, 'success', 200, null);
+    const returnData = await pool.query(queryHelper.cancelBooking, [booking_id]);
+    returnData.rows[0]['message'] = "Updated";
+
+    return jsonResponse.success(res, 'success', 200, returnData.rows[0]);
   }
 }
 

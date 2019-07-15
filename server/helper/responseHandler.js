@@ -14,7 +14,7 @@ class JSONResponse {
     res.status(code);
     res.json({
       status,
-      data,
+      data
     });
   }
 

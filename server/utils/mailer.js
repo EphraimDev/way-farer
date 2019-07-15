@@ -20,7 +20,7 @@ class Mailer {
    * @param {string} message
    * @returns {nothing} returns nothing
    */
-  static sendMail({ to, subject, message}) {
+  static async sendMail({ to, subject, message}) {
 
     // setup email data
     const mailOptions = {
@@ -31,17 +31,17 @@ class Mailer {
       html: message,
     };
 
-    const transporter = nodemailer.createTransport(config.mail.smtpConfig);
+    try {
+      const transporter = nodemailer.createTransport(config.mail.smtpConfig);
+      
+      let info = await transporter.sendMail(mailOptions);
+      return info.messageId;
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return 'failed';
-      }
-      return console.log(info.messageId);
-    });
-
-    return 'success';
+    } catch (error) {
+      return error
+    }
   }
+
 
   /**
    * Sends Mail after user succesfully creates an account

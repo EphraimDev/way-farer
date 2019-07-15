@@ -10,9 +10,6 @@ import jsonResponse from '../helper/responseHandler';
  * @class BusController
  */
 class BusController {
-  constructor() {
-    this.bus = this.addBus;
-  }
 
   /**
    * Add a new bus to the database
@@ -26,10 +23,6 @@ class BusController {
     const {
       number_plate, manufacturer, model, year, capacity, color,
     } = req.body;
-
-    if (req.user.is_admin !== true) {
-      return jsonResponse.error(res, 'error', 401, 'Admin access only');
-    }
 
     const findBus = await pool.query(queryHelper.getBus, [number_plate.toLowerCase()]);
 
@@ -46,7 +39,7 @@ class BusController {
     const bus_id = guid.formGuid();
 
     const newBus = await pool.query(queryHelper.addBus,
-      [bus_id, req.user.user_id, number_plate, manufacturer,
+      [req.user.user_id, number_plate, manufacturer,
         model, year, capacity, color, img, moment.createdAt]);
 
     return jsonResponse.success(res, 'success', 201, newBus.rows[0]);

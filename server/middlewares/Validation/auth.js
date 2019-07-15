@@ -1,5 +1,3 @@
-import Regex from '../../helper/regex';
-
 /**
  * @exports
  * @class AuthValidation
@@ -20,10 +18,10 @@ class AuthValidation {
       last_name,
     } = req.body;
 
-    if (typeof first_name !== 'string' || first_name.length < 1) {
+    if (!first_name) {
       return res.status(400).json({ error: 'First name is required' });
     }
-    if (typeof last_name !== 'string' || last_name.length < 1) {
+    if (!last_name) {
       return res.status(400).json({ error: 'Last name is required' });
     }
 
@@ -44,8 +42,8 @@ class AuthValidation {
       email,
     } = req.body;
 
-    if (typeof email !== 'string' || email.toString().trim() === '' || Regex.emailRegex.test(email) === false) {
-      return res.status(400).send({ error: 'Wrong email format' });
+    if (!email) {
+      return res.status(400).send({ error: 'Email is required' });
     }
     return next();
   }
@@ -65,8 +63,8 @@ class AuthValidation {
       password,
     } = req.body;
 
-    if (typeof password !== 'string' || password.toString().trim() === '' || Regex.passwordRegex.test(password) === false) {
-      return res.status(400).send({ error: 'Password must contain minimum of eight characters, at least one uppercase letter, one lowercase letter, one number and one special character' });
+    if (!password) {
+      return res.status(400).send({ error: 'Password is required' });
     }
     return next();
   }

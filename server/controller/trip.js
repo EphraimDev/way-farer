@@ -22,19 +22,17 @@ class TripController {
       bus_id, origin, destination, trip_date, trip_time, fare,
     } = req.body;
 
-    const trip_id = guid.formGuid();
-
     const findBus = await pool.query(queryHelper.getBusById, [bus_id]);
 
     if (findBus.rowCount < 1) {
       return jsonResponse.error(res, 'error', 404, 'Selected bus does not exist');
     }
 
-    const findActiveBus = await pool.query(queryHelper.getActiveBus, [bus_id, 'Active']);
+    // const findActiveBus = await pool.query(queryHelper.getActiveBus, [bus_id, 'Active']);
 
-    if (findActiveBus.rowCount >= 1) {
-      return jsonResponse.error(res, 'error', 409, 'A trip with this bus is active');
-    }
+    // if (findActiveBus.rowCount >= 1) {
+    //   return jsonResponse.error(res, 'error', 409, 'A trip with this bus is active');
+    // }
 
     let tripTime = trip_time;
     if (!trip_time) {
@@ -42,8 +40,8 @@ class TripController {
       tripTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     }
     const newTrip = await pool.query(queryHelper.addTrip,
-      [trip_id, req.user.user_id, bus_id, origin.toLowerCase(), destination.toLowerCase(), trip_date, tripTime, fare, 'Active', moment.createdAt]);
-
+      [req.user.user_id, bus_id, origin.toLowerCase(), destination.toLowerCase(), trip_date, tripTime, fare, 'Active', moment.createdAt]);
+    newTrip.rows[0]['id'] = newTrip.rows[0].trip_id;
     return jsonResponse.success(res, 'success', 201, newTrip.rows[0]);
   }
 
@@ -86,9 +84,9 @@ class TripController {
   static async getAllTrips(req, res) {
     const trips = await pool.query(queryHelper.allTrips, []);
 
-    if (trips.rowCount <= 0) {
-      return jsonResponse.error(res, 'error', 404, 'There are no trips');
-    }
+    // if (trips.rowCount <= 0) {
+    //   return jsonResponse.error(res, 'error', 404, 'There are no trips');
+    // }
 
     return jsonResponse.success(res, 'success', 200, trips.rows);
   }
@@ -155,7 +153,7 @@ class TripController {
 
     const updatedTrip = await pool.query(queryHelper.updateTrip,
       [busId, newOrigin.toLowerCase(), newDestination.toLowerCase(), tripDate, tripTime, newFare, newStatus, moment.updatedAt, trip_id]);
-
+      updatedTrip.rows[0]['message'] = "Updated";
     return jsonResponse.success(res, 'success', 200, updatedTrip.rows[0]);
   }
 

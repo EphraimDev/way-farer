@@ -20,10 +20,13 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "clean": "rimraf dist",
     "build": "babel ./server --out-dir dist",
-    "prod": "cross-env NODE_ENV=production npm-run-all clean build start:prod",
-    "start:prod": "npm-run-all prod:create start:prod",
-    "prod:db": "node dist/migrations/table",
-    "test-db": "cross-env NODE_ENV=test babel-node server/migrations/table"
+    "prod": "cross-env NODE_ENV=development npm-run-all clean build start:prod",
+    "start:prod": "npm-run-all prod:db:create prod:db:seed start",
+    "prod:db:create": "node dist/migrations/table",
+    "prod:db:seed": "node dist/seeders/seed",
+    "test:db:dev": "npm-run-all test:db:create test:db:seed test",
+    "test:db:create": "cross-env NODE_ENV=test babel-node server/migrations/table",
+    "test:db:seed": "cross-env NODE_ENV=test babel-node server/seeders/seed"
   },
   "repository": {
     "type": "git",

@@ -11,9 +11,6 @@ const secret = config.jwtSecret;
  * @class Authorization
  */
 class Authorization {
-  constructor() {
-    this.authenticate = this.authorize;
-  }
 
   /**
    * @method generateToken
@@ -51,17 +48,19 @@ class Authorization {
   static async authorize(req, res, next) {
     try {
       //const token = await req.headers.token.split(' ')[1];
-      const {token} = req.headers;
-
+      const {authorization} = req.headers;
+      const token = authorization.split(' ')[1];
+      
       const decoded = await jwt.verify(token, secret);
 
       const foundUser = await pool.query(query.text, [decoded.email]);
 
       [req.user] = foundUser.rows;
-      if (req.user === undefined) {
-        return jsonResponse.error(res, 'error', 401, 'Token is invalid');
-      }
-
+      
+      // if (req.user === undefined) {
+      //   return jsonResponse.error(res, 'error', 401, 'Token is invalid');
+      // }
+      
       return next();
     } catch (err) {
       return jsonResponse.error(res, 'error', 401, 'Token is invalid or not provided');

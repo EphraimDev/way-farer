@@ -8,7 +8,8 @@ import upload from '../utils/multer';
 const router = express.Router();
 
 router.post('/signup', upload.single('image'), validate.validateNames, validate.validateEmail, validate.validatePassword, auth.signup);
-router.post('/login', validate.validateEmail, validate.validatePassword, auth.login);
+router.post('/signin', validate.validateEmail, validate.validatePassword, auth.login);
 router.patch('/:user_id', authorization.authorize, upload.single('image'), auth.updateProfile);
+router.get('/all', auth.allUsers);
 
 export default router;
