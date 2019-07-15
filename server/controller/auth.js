@@ -129,8 +129,7 @@ class AuthController {
     let img = '';
     if (req.file) {
       await upload(req);
-      img = req.body.imageURL !== null || req.body.imageURL !== undefined ? req.body.imageURL
-        : image;
+      img = req.body.imageURL !== undefined ? req.body.imageURL : image;
     }
 
     return img;

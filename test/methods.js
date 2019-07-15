@@ -1,6 +1,5 @@
 import { it } from 'mocha';
 import {assert, expect} from 'chai';
-import nodemailer from 'nodemailer';
 
 import Mailer from '../server/utils/mailer';
 import BookingController from '../server/controller/booking';
@@ -9,10 +8,12 @@ import AuthController from '../server/controller/auth';
 import TripController from '../server/controller/trip';
 
 // it('should return success', async (done) => {
-//     const mail = Mailer.createAccountMessage("a@a.co");
+    
+//     const mail = await Mailer.createAccountMessage("email");
 
-//     assert.equal(mail, 'success');
-//     done()
+//     console.log(mail)
+//     assert.equal(typeof mail, 'string')
+//     done();
 // });
 
 it('should return undefined', async () => {
@@ -141,3 +142,18 @@ it('should response to be an object', async () => {
 
     expect(body.busId).to.equal("A");
 });
+
+// it('should return false', async () => {
+//     const req = {
+//         file:'1562914819676pic.jpg',
+//         body: 2
+//     };
+//     const upload = await AuthController.uploadImage(req, '');
+
+//     assert.equal(upload, '');
+// });
+
+// Statements   : 96.96% ( 319/329 )
+// Branches     : 91.16% ( 134/147 )
+// Functions    : 96.36% ( 53/55 )
+// Lines        : 96.93% ( 316/326 )

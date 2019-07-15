@@ -31,22 +31,17 @@ class Mailer {
       html: message,
     };
 
-    const transporter = nodemailer.createTransport(config.mail.smtpConfig);
-
-    let result;
-    await transporter.sendMail(mailOptions, (error, info) => {
-      console.log(1)
-      console.log(error, info)
-      if (error) {
-        result = 'failed';
-      }else{
-        result = info.messageId;
-      }
+    try {
+      const transporter = nodemailer.createTransport(config.mail.smtpConfig);
       
-    });
-    console.log(result)
-    return result;
+      let info = await transporter.sendMail(mailOptions);
+      return info.messageId;
+
+    } catch (error) {
+      return error
+    }
   }
+
 
   /**
    * Sends Mail after user succesfully creates an account
