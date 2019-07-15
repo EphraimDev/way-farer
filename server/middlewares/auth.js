@@ -50,6 +50,7 @@ class Authorization {
       //const token = await req.headers.token.split(' ')[1];
       const {authorization} = req.headers;
       const token = authorization.split(' ')[1];
+      console.log(req.headers)
       
       const decoded = await jwt.verify(token, secret);
 
@@ -63,6 +64,7 @@ class Authorization {
       
       return next();
     } catch (err) {
+      console.log(2)
       return jsonResponse.error(res, 'error', 401, 'Token is invalid or not provided');
     }
   }
@@ -78,6 +80,7 @@ class Authorization {
    */
   static async checkAdmin(req, res, next) {
     if (req.user.is_admin !== true) {
+      console.log(1)
       return jsonResponse.error(res, 'error', 401, 'Admin access only');
     }
 

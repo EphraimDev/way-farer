@@ -41,7 +41,7 @@ class BookingController {
 
     if (seat && booked.rowCount > 0) {
       const checkSeat = await BookingController.checkSeat(booked.rows, seat);
-
+      console.log(checkSeat)
       if (checkSeat !== undefined) {
         return jsonResponse.error(res, 'error', 400, 'Seat number is not available');
       }
