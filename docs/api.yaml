@@ -15,12 +15,12 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: firstname
+        - name: first_name
           description: First name of the user
           required: true
           type: string
           in: body
-        - name: lastname
+        - name: last_name
           description: Last name of the user
           required: true
           type: string
@@ -35,7 +35,7 @@ paths:
           required: true
           type: string
           in: body
-        - name: isAdmin
+        - name: is_admin
           description: Admin status of user
           required: false
           type: boolean
@@ -55,7 +55,7 @@ paths:
           description: User exists already
         400:
           description: error
-  /auth/login:
+  /auth/signin:
     post:
       tags:
         - Auth
@@ -93,7 +93,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: numberPlate
+        - name: number_plate
           description: Unique plate number of the bus
           required: true
           type: string
@@ -147,7 +147,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: busId
+        - name: bus_id
           description: Bus unique ID
           required: true
           type: string
@@ -162,12 +162,12 @@ paths:
           required: true
           type: string
           in: body
-        - name: tripDate
+        - name: trip_date
           description: Date of the trip
           required: true
           type: string
           in: body
-        - name: tripTime
+        - name: trip_time
           description: Take off time for the trip
           required: true
           type: string
@@ -182,13 +182,13 @@ paths:
           description: success
           schema:
             $ref: "#/definitions/trip"
-        409:
-          description: A trip with this bus is active
+        # 409:
+        #   description: A trip with this bus is active
         401:
           description: Admin access only
         404:
           description: Selected bus does not exist
-  /trips/{tripId}:
+  /trips/{trip_id}:
     delete:
       tags:
         - Trip
@@ -199,7 +199,7 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: tripId
+          name: trip_id
           description: This is the unique ID of the trip
           required: true
           type: string
@@ -212,6 +212,57 @@ paths:
           description: Admin access only
         404:
           description: Trip does not exist
+    patch:
+      tags:
+        - Trip
+      summary: Updates a trip
+      security:
+        - Bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: bus_id
+          description: Bus unique ID
+          required: true
+          type: string
+          in: body
+        - name: origin
+          description: Bus take off point
+          required: false
+          type: string
+          in: body
+        - name: destination
+          description: Destination of the bus
+          required: false
+          type: string
+          in: body
+        - name: trip_date
+          description: Date of the trip
+          required: false
+          type: string
+          in: body
+        - name: trip_time
+          description: Take off time for the trip
+          required: false
+          type: string
+          in: body
+        - name: fare
+          description: Transport fare for the trip
+          required: false
+          type: integer
+          in: body
+      responses: # server responses
+        200:
+          description: success
+          schema:
+            $ref: "#/definitions/trip"
+        # 409:
+        #   description: A trip with this bus is active
+        401:
+          description: Admin access only
+        404:
+          description: Selected trip does not exist
+  
   /trips/:
     get:
       tags:
@@ -251,7 +302,7 @@ paths:
             $ref: "#/definitions/trip"
         404:
           description: There are no trips
-  /booking/:
+  /bookings/:
     post:
       tags:
         - Booking
@@ -262,7 +313,7 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: tripId
+          name: trip_id
           description: ID of a trip
           required: true
           type: string
@@ -278,6 +329,8 @@ paths:
             $ref: "#/definitions/booking"
         400:
           description: Failed
+        404:
+          description: Trip does not exist
     get:
       tags:
         - Booking
@@ -286,20 +339,14 @@ paths:
         - Bearer: []
       produces:
         - application/json
-      parameters:
-        - in: path
-          name: BookingId
-          description: Unique ID of a booking
-          required: true
-          type: string
       responses: # server responses
         200:
           description: success
           schema:
             $ref: "#/definitions/booking"
-        404:
-          description: There are no bookings
-  /booking/{bookingId}:
+        # 404:
+        #   description: There are no bookings
+  /booking/{booking_id}:
     delete:
       tags:
         - Booking
@@ -310,7 +357,7 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: BookingId
+          name: booking_id
           description: Unique ID of a booking
           required: true
           type: string
@@ -327,9 +374,9 @@ definitions: # Schema defination for request body
     properties:
       user_id:
         type: string
-      firstname:
+      first_name:
         type: string
-      lastname:
+      last_name:
         type: string
       email:
         type: string
