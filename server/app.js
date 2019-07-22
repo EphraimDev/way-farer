@@ -40,7 +40,7 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 // use swagger-Ui-express for your app documentation endpoint
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
